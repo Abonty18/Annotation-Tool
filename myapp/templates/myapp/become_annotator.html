@@ -1,0 +1,27 @@
+<!-- myapp/templates/myapp/become_annotator.html -->
+
+{% load static %}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Become Annotator</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Become an Annotator</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="button">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

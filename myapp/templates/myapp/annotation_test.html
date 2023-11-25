@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annotation Test</title>
+    <link rel="stylesheet" href="{% static 'css/ann.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Annotation Test</h1>
+        <form method="post" action="{% url 'submit_test' %}">
+            {% csrf_token %}
+            {% for review in reviews %}
+                <div class="review">
+                    <p>{{ review.content }}</p>
+                    <div class="annotations">
+                        <label><input type="radio" name="annotation_{{review.id}}" value="0"> Label 0</label>
+                        <label><input type="radio" name="annotation_{{review.id}}" value="1"> Label 1</label>
+                        <label><input type="radio" name="annotation_{{review.id}}" value="2"> Label 2</label>
+                    </div>
+                </div>
+            {% endfor %}
+            <button type="submit" class="submit-btn">Submit Annotations</button>
+        </form>
+    </div>
+</body>
+</html>

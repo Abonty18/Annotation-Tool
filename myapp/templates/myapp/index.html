@@ -1,0 +1,21 @@
+{% load static %}  <!-- Add this line at the top of your template -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Landing Page</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Annotation Tool</h1>
+        <div class="buttons">
+            <!-- Inside your index.html -->
+
+        <a href="{% url 'create_project' %}" class="button">Create Project</a>
+        <a href="{% url 'become_annotator' %}" class="button">Become Annotator</a>
+
+        </div>
+    </div>
+</body>
+</html>
