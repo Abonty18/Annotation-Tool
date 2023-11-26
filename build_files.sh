@@ -3,13 +3,16 @@
 # Exit in case of error
 set -e
 
+# Get the current directory of the script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
 # Create a virtual environment if it doesn't exist
-if [ ! -d "venv" ]; then
-  python3 -m venv venv
+if [ ! -d "$SCRIPT_DIR/venv" ]; then
+  python3 -m venv "$SCRIPT_DIR/venv"
 fi
 
-# Activate the virtual environment
-source venv/bin/activate
+# Activate the virtual environment using an absolute path
+source "$SCRIPT_DIR/venv/bin/activate"
 
 # Upgrade pip to the latest version
 pip install --upgrade pip
@@ -29,8 +32,5 @@ echo $PYTHONPATH
 # Print the location of the Django package
 python -c "import django; print(django.__path__)"
 
-
 # Deactivate the virtual environment
 deactivate
-
-
