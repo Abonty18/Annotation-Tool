@@ -4,14 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Annotation Test</title>
+    <title>Annotation Test Results</title>
     <link rel="stylesheet" href="{% static 'css/result.css' %}">
 </head>
 <body>
-    <div class="container"> <!-- Added container for styling -->
+    <div class="container">
         <h1>Annotation Test Results</h1>
         <p>Your accuracy is: {{ accuracy }}%</p>
-        <a href="{% url 'home' %}">Return to Home</a>
+
+        {% if accuracy > 90 %}
+            <!-- Button to start annotation if accuracy is greater than 90% -->
+            <a href="{% url 'start_annotation' %}" class="btn-start-annotation">Start Annotation</a>
+        {% else %}
+            <!-- JavaScript to redirect to home if accuracy is not greater than 90% -->
+            <script type="text/javascript">
+                window.onload = function() {
+                    // Redirect to home page
+                    window.location.href = "{% url 'home' %}";
+                }
+            </script>
+        {% endif %}
+      
     </div>
 </body>
 </html>

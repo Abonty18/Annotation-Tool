@@ -26,7 +26,7 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('myapp.urls')),  # Including URLs from myapp
-    path('sign-in/', sign_in, name='sign_in'),
+
     # ... other project-wide url patterns ...
 ]
 

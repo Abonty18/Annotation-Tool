@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['.vercel.app','.now.sh', '127.0.0.1','localhost']
 
+LOGIN_URL = 'become-annotator'  # Replace 'login' with the path to your login view
 
 # Application definition
 
