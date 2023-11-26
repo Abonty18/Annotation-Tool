@@ -11,8 +11,26 @@ from .models import Student
 from .forms import StudentForm
 import os
 from django.conf import settings
+from .models import Review
+
+def load_reviews():
+    file_path = os.path.join(settings.BASE_DIR, 'myapp', 'reviews.json')
+    with open(file_path, 'r') as file:
+        reviews = json.load(file)
+        for review_data in reviews:
+            Review.objects.get_or_create(
+                id=review_data['id'],
+                defaults={
+                    'content': review_data['content'],
+                    'ground_truth_annotation': review_data['label']
+                }
+            )
+
 
 def become_annotator(request):
+    # Clear any existing messages
+    storage = messages.get_messages(request)
+    storage.used = True
     if request.method == 'POST':
         form = StudentForm(request.POST)
         if form.is_valid():
@@ -41,17 +59,18 @@ def index(request):
 # myapp/views.py
 
 def start_test(request):
-    # Construct the absolute file path to the JSON file
-    file_path = os.path.join(settings.BASE_DIR, 'myapp', 'reviews.json')
+    # Fetch all reviews from the database
+    reviews = Review.objects.all()
 
-    # Load reviews from JSON file
-    with open(file_path, 'r') as file:
-        reviews = json.load(file)
+    # Get the count of reviews or 10, whichever is smaller
+    count = min(reviews.count(), 10)
 
-    # Select 20 random reviews
-    random_reviews = random.sample(reviews, 20)
+    # Select random reviews
+    random_reviews = random.sample(list(reviews), count)
 
     return render(request, 'myapp/annotation_test.html', {'reviews': random_reviews})
+
+
 
 
 
@@ -95,6 +114,7 @@ def sign_in(request):
 #     return render(request, 'myapp/become_annotator.html', {'form': form})
 
 def submit_test(request):
+
     if request.method == 'POST':
         user_annotations = {key: int(value) for key, value in request.POST.items() if key.startswith('annotation_')}
         correct_count = 0
@@ -102,6 +122,8 @@ def submit_test(request):
 
         if total_annotations == 0:
             messages.error(request, 'No annotations were submitted.')
+            print("Total annotations:", total_annotations)
+            print("Correct count:", correct_count)
             return redirect('start_test')
 
         for review_id, user_annotation_value in user_annotations.items():
@@ -110,16 +132,23 @@ def submit_test(request):
                 review = Review.objects.get(id=review_id_num)
                 if review.ground_truth_annotation == user_annotation_value:
                     correct_count += 1
-            except (Review.DoesNotExist, ValueError):
-                messages.error(request, 'There was an error processing your annotations.')
-                return redirect('start_test')  # Or handle the error differently
+            except (Review.DoesNotExist, ValueError) as e:
+                print("Exception:", e)
+                messages.error(request, 'There was an error processing your annotations.', extra_tags='submit_test')
+                return redirect('start_test')
 
         accuracy = (correct_count / total_annotations) * 100
         # Display accuracy or redirect to a results page
+        print("Total annotations:", total_annotations)
+        print("Correct count:", correct_count)
         return render(request, 'myapp/test_results.html', {'accuracy': accuracy})
     else:
         # Handle case where method is not POST
+        print("Total annotations:", total_annotations)
+        print("Correct count:", correct_count)
         return redirect('start_test')
+    
+
     
 
 
