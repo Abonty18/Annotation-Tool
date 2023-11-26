@@ -18,33 +18,21 @@ def become_annotator(request):
         if form.is_valid():
             email = form.cleaned_data['email']
 
-            # Check if the email already exists as a username
-            if User.objects.filter(username=email).exists():
+            # Check if the email already exists in Student model
+            if Student.objects.filter(email=email).exists():
                 messages.error(request, 'Email already exists. Please sign in.')
                 return redirect('sign_in')  # Redirect to the sign-in page
 
-            # Create a User instance
-            user = User.objects.create_user(
-                username=email, 
-                email=email, 
-                password=form.cleaned_data['password']
-            )
+            # Save the new Student
+            form.save()
 
-            # Now create a Student instance
-            Student.objects.create(
-                user=user,
-                department=form.cleaned_data['department'],
-                program=form.cleaned_data['program'],
-                graduation_year=form.cleaned_data['graduation_year']
-            )
-
-            # Redirect to the test or another appropriate page
-            return redirect('start_test') 
-
+            # Redirect to an appropriate page after registration
+            return redirect('start_test')
     else:
         form = StudentForm()
 
     return render(request, 'myapp/become_annotator.html', {'form': form})
+
 
 
 
@@ -116,20 +104,28 @@ def submit_test(request):
             messages.error(request, 'No annotations were submitted.')
             return redirect('start_test')
 
-        for review_id, annotation in user_annotations.items():
+        for review_id, user_annotation_value in user_annotations.items():
             try:
                 review_id_num = int(review_id.split('_')[1])
                 review = Review.objects.get(id=review_id_num)
-                if review.ground_truth_annotation == annotation:
+                if review.ground_truth_annotation == user_annotation_value:
                     correct_count += 1
             except (Review.DoesNotExist, ValueError):
                 messages.error(request, 'There was an error processing your annotations.')
-                return redirect('start_test')  # Or handle error differently
+                return redirect('start_test')  # Or handle the error differently
 
-        accuracy = correct_count / total_annotations
+        accuracy = (correct_count / total_annotations) * 100
         # Display accuracy or redirect to a results page
-        messages.success(request, f'Your annotation accuracy: {accuracy:.2%}')
         return render(request, 'myapp/test_results.html', {'accuracy': accuracy})
+    else:
+        # Handle case where method is not POST
+        return redirect('start_test')
+    
 
+
+def test_results(request):
+    # Passing a default or dummy accuracy value
+    dummy_accuracy = 0  # You can change this as needed
+    return render(request, 'myapp/test_results.html', {'accuracy': dummy_accuracy})
 
 

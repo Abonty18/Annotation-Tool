@@ -18,19 +18,21 @@ class Annotation(models.Model):
 
 
 class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
-    name = models.CharField(max_length=100)
-    email = models.EmailField()
     DEPARTMENT_CHOICES = [
         ('dept1', 'Department 1'),
         ('dept2', 'Department 2'),
         # Add more departments as needed
     ]
+
+    name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)  # Ensure email is unique
     department = models.CharField(max_length=100, choices=DEPARTMENT_CHOICES)
     program = models.CharField(max_length=100)
     graduation_year = models.IntegerField()
     password = models.CharField(max_length=128)
 
     def save(self, *args, **kwargs):
-        self.password = make_password(self.password)
+        # Hash password only if it's a new record or if the password has been changed
+        if not self.pk or 'password' in kwargs.get('update_fields', []):
+            self.password = make_password(self.password)
         super(Student, self).save(*args, **kwargs)
