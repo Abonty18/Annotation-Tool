@@ -1,13 +1,35 @@
 .container {
-    width: 80%;
+    width: 90%;
     margin: auto;
-    padding-top: 20px;
+    max-width: 1200px;
+    text-align: center; /* Center the main heading */
 }
+
+.main-heading {
+    margin-bottom: 20px; /* Spacing below the main heading */
+}
+
+.content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.guidelines, .reviews {
+    flex-basis: 48%; /* Adjust the width as needed */
+    text-align: left; /* Align text to the left for sub sections */
+}
+
+.guidelines {
+    padding-right: 20px; /* Space between columns */
+}
+
+
 .review {
     margin-bottom: 20px;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    background-color: rgb(149, 248, 215);
 }
 .review p {
     font-size: 1.1em;
@@ -20,8 +42,29 @@
     padding: 10px 20px;
     font-size: 1em;
     color: white;
-    background-color: rgb(87, 170, 229);
+    background-color: rgb(73, 163, 228);
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+.guidelines table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgb(160, 197, 255);
+    border-radius: 5px;
+}
+
+.guidelines th, .guidelines td {
+    border: 1px solid #f5f3f3;
+    padding: 8px;
+}
+
+.guidelines th {
+    background-color: #cfcccc;
+    text-align: left;
+}
+
+.guidelines td ul, .guidelines td ol {
+    margin: 0;
+    padding-left: 20px;
 }
