@@ -6,6 +6,9 @@ set -e
 # Ensure pip is available
 python3 -m ensurepip
 
+# Install the sqlite3 package
+python3 -m pip install sqlite3
+
 # Upgrade pip to the latest version
 python3 -m pip install --upgrade pip
 
