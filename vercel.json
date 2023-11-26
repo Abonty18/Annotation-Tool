@@ -28,12 +28,12 @@
        }
      ],
      "env": {
-       "DJANGO_SETTINGS_MODULE": "myproject.settings"
-     },
-     "build": {
-       "env": {
-         "DJANGO_SETTINGS_MODULE": "myproject.settings"
-       }
-     }
-   }
+          "DJANGO_SETTINGS_MODULE": "myproject.settings"
+        },
+        "build": {
+          "env": {
+            "DJANGO_SETTINGS_MODULE": "myproject.settings"
+          }
+        }
+      }
    
