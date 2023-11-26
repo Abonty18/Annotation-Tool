@@ -10,12 +10,13 @@ python3 -m ensurepip
 python3 -m pip install --upgrade pip
 
 # Install Python dependencies directly without a virtual environment
-pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 
 # Collect static files
-python manage.py collectstatic --noinput
+python3 manage.py collectstatic --noinput
 
 # List installed dependencies for debugging purposes
-pip freeze
+python3 -m pip freeze
 
-# No need to deactivate the virtual environment since we're not using one
+# Print the current Python version for debugging
+python3 --version
