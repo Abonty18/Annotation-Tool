@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 from .forms import StudentForm
-from .models import Student
+from .models import CustomUser
 from django.contrib.auth import authenticate, login
 from myapp.models import Review
 import json
 import random
 from django.contrib.auth.models import User
-from .models import Student
+from .models import StudentProject
 from .forms import StudentForm
 import os
 from django.conf import settings
@@ -32,47 +32,70 @@ def load_reviews():
 
 @login_required
 def start_annotation(request):
+    user = request.user  # Directly use the logged-in user
+
     page_number = request.GET.get('page', 1)
-    student = request.user.student
 
-    # Fetch reviews not yet annotated by this student
-    annotated_review_ids = StudentAnnotation.objects.filter(student=student).values_list('review_id', flat=True)
-    unannotated_reviews = UnannotatedReview.objects.exclude(id__in=annotated_review_ids)
+    # Check if the user has an ongoing project
+    project, created = StudentProject.objects.get_or_create(student=user)
 
-    # Set up pagination
-    paginator = Paginator(unannotated_reviews, 10)  # Show 10 reviews per page
+    if not created:
+        page_number = project.last_page
+
+    # Fetch reviews for annotation
+    unannotated_reviews = UnannotatedReview.objects.all()
+    paginator = Paginator(unannotated_reviews, 10)
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'myapp/start_annotation.html', {'page_obj': page_obj})
+    return render(request, 'myapp/start_annotation.html', {
+        'page_obj': page_obj,
+        'project': project
+    })
+
+
 
 
 def handle_annotation_submission(request):
     if request.method == 'POST':
-        if 'action' in request.POST and request.POST['action'] == 'save':
-            # Retrieve the current student
-            student = request.user.student
+        student = request.user.student
+        project, _ = StudentProject.objects.get_or_create(student=student)
 
-            # Process each annotation in the form data
-            for key, value in request.POST.items():
-                if key.startswith('annotation_'):  # Assuming your form fields for annotations start with 'annotation_'
-                    review_id = int(key.split('_')[1])  # Extracting review ID from the form field name
-                    annotation_content = value  # The actual annotation made by the student
+        if 'action' in request.POST:
+            if request.POST['action'] == 'save':
+                # Process each annotation in the form data
+                for key, value in request.POST.items():
+                    if key.startswith('annotation_'):
+                        review_id = int(key.split('_')[1])  # Extracting review ID
+                        annotation_content = value
 
-                    # Retrieve the corresponding UnannotatedReview
-                    review = UnannotatedReview.objects.get(id=review_id)
+                        # Retrieve or create the corresponding UnannotatedReview
+                        review, _ = UnannotatedReview.objects.get_or_create(id=review_id)
 
-                    # Create or update the StudentAnnotation
-                    StudentAnnotation.objects.update_or_create(
-                        student=student, 
-                        review=review, 
-                        defaults={'annotation': annotation_content}
-                    )
+                        # Create or update the StudentAnnotation
+                        StudentAnnotation.objects.update_or_create(
+                            student=student,
+                            review=review,
+                            defaults={'annotation': annotation_content}
+                        )
 
-            # Redirect to a confirmation page or back to the annotation page
-            return redirect('some_success_or_annotation_page')
+                # Update the project's last page if provided
+                page_number = request.POST.get('page_number')
+                if page_number:
+                    project.last_page = int(page_number)
+                    project.save()
+
+                # Check if there's a project name to be saved
+                project_name = request.POST.get('project_name')
+                if project_name:
+                    project.name = project_name
+                    project.save()
+
+                # Redirect to a confirmation page or back to the annotation page
+                return redirect('home')
 
     # If the request method is not POST or the 'action' is not 'save', redirect to another page
-    return redirect('some_other_view')
+    return redirect('home')
+
 
 
 def become_annotator(request):
@@ -85,7 +108,7 @@ def become_annotator(request):
             email = form.cleaned_data['email']
 
             # Check if the email already exists in Student model
-            if Student.objects.filter(email=email).exists():
+            if CustomUser.objects.filter(email=email).exists():
                 messages.error(request, 'Email already exists. Please sign in.')
                 return redirect('sign_in')  # Redirect to the sign-in page
 
@@ -127,21 +150,54 @@ def create_project(request):
     return render(request, 'create_project.html')
 # myapp/views.py
 
+# def sign_in(request):
+#     if request.method == 'POST':
+#         email = request.POST.get('email')
+#         password = request.POST.get('password')
+
+#         if email and password:
+#             user = authenticate(username=email, password=password)
+#             if user is not None:
+#                 login(request, user)
+#                 # Redirect to the test or some other page
+#                 return redirect('start_test')
+#             else:
+#                 messages.error(request, 'Invalid email or password.')
+
+#     return render(request, 'myapp/sign_in.html')
+
 def sign_in(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        if email and password:
-            user = authenticate(username=email, password=password)
-            if user is not None:
-                login(request, user)
-                # Redirect to the test or some other page
-                return redirect('start_test')
-            else:
-                messages.error(request, 'Invalid email or password.')
+        # Debugging
+        print("Email:", email)
+        print("Password:", password)
+
+        # user = authenticate(username=email, password=password)
+        # print("User:", user)  # Check if user is not None
+
+        # if user is not None:
+        #     login(request, user)
+        #     ## Get the 'next' parameter from the request
+        #     next_page = request.GET.get('next', 'start_annotation')
+        #     return redirect(next_page)
+        user = authenticate(username=email, password=password)
+        if user is not None and user.is_active:
+            login(request, user)
+            next_page = request.GET.get('next', 'start_annotation')
+            return redirect(next_page)
+        else:
+            messages.error(request, 'Invalid email or password.')
+
+
+        # else:
+        #     messages.error(request, 'Invalid email or password.')
+
 
     return render(request, 'myapp/sign_in.html')
+
 
 
 def submit_test(request):

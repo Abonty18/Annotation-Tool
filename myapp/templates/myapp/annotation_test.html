@@ -26,9 +26,9 @@
                         <td>Label Categories</td>
                         <td>
                             <ul>
-                                <li><strong>Privacy-Related Feature Request (Label 1):</strong> Assign this label if the review is discussing a feature request of the app related to user privacy.</li>
-                                <li><strong>Privacy-Related Bug (Label 2):</strong> Assign this label if the review is reporting a bug or issue related to user privacy.</li>
-                                <li><strong>Not Privacy-Related (Label 0):</strong> Assign this label if the review is not discussing any privacy-related aspects.</li>
+                                <li><strong>Privacy-Related Feature Request</strong> Assign this label if the review is discussing a feature request of the app related to user privacy.</li>
+                                <li><strong>Privacy-Related Bug</strong> Assign this label if the review is reporting a bug or issue related to user privacy.</li>
+                                <li><strong>Not Privacy-Related</strong> Assign this label if the review is not discussing any privacy-related aspects.</li>
                             </ul>
                         </td>
                     </tr>
@@ -45,7 +45,7 @@
                     <tr>
                         <td>Examples</td>
                         <td>
-                            Reviews like advising or requesting to update any privacy-related feature of the app should be labeled as Privacy-Related Feature Request (Label 1). If a review reports personal data exposure due to a bug, label it as Privacy-Related Bug (Label 2). Reviews discussing the app's user interface with no mention of privacy should be labeled as Not Privacy-Related (Label 0).
+                            Reviews like advising or requesting to update any privacy-related feature of the app should be labeled as Privacy-Related Feature Request. If a review reports personal data exposure due to a bug, label it as Privacy-Related Bug. Reviews discussing the app's user interface with no mention of privacy should be labeled as Not Privacy-Related.
                         </td>
                     </tr>
                     <tr>
@@ -64,9 +64,9 @@
                         <div class="review">
                             <p>{{ review.content }}</p>
                             <div class="annotations">
-                                <label><input type="radio" name="annotation_{{review.id}}" value="0"> Label 0</label>
-                                <label><input type="radio" name="annotation_{{review.id}}" value="1"> Label 1</label>
-                                <label><input type="radio" name="annotation_{{review.id}}" value="2"> Label 2</label>
+                                <label><input type="radio" name="annotation_{{review.id}}" value="0"> Not related to privacy</label>
+                                <label><input type="radio" name="annotation_{{review.id}}" value="1"> Privacy Feature request</label>
+                                <label><input type="radio" name="annotation_{{review.id}}" value="2"> Privacy related bug</label>
                             </div>
                         </div>
                     {% endfor %}

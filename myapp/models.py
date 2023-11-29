@@ -4,6 +4,56 @@ from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.base_user import BaseUserManager
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError(_('The Email must be set'))
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff=True.'))
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser=True.'))
+
+        return self.create_user(email, password, **extra_fields)
+
+class CustomUser(AbstractUser):
+    username = None
+    email = models.EmailField(_('email address'), unique=True)
+
+    # New fields
+    DEPARTMENT_CHOICES = [
+        ('cse', 'CSE'),
+        ('eee', 'EEE'),
+        ('mpe', 'MPE'),
+        ('btm', 'BTM'),
+        # ... other departments ...
+    ]
+    department = models.CharField(max_length=100, choices=DEPARTMENT_CHOICES, default='default_department_value')
+
+    has_taken_software_course = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return self.email
+
+
 
 class Review(models.Model):
     content = models.TextField()
@@ -22,29 +72,12 @@ class Annotation(models.Model):
 
 
 
-class Student(models.Model):
-    DEPARTMENT_CHOICES = [
-        ('dept1', 'Department 1'),
-        ('dept2', 'Department 2'),
-        # Add more departments as needed
-    ]
-
-    name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)  # Ensure email is unique
-    department = models.CharField(max_length=100, choices=DEPARTMENT_CHOICES)
-    program = models.CharField(max_length=100)
-    graduation_year = models.IntegerField()
-    password = models.CharField(max_length=128)
-    accuracy = models.FloatField(default=0)
-
-    def save(self, *args, **kwargs):
-        # Hash password only if it's a new record or if the password has been changed
-        if not self.pk or 'password' in kwargs.get('update_fields', []):
-            self.password = make_password(self.password)
-        super(Student, self).save(*args, **kwargs)
-
-
 class StudentAnnotation(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     review = models.ForeignKey(UnannotatedReview, on_delete=models.CASCADE)
     annotation = models.TextField()  # or whatever field type is appropriate
+
+class StudentProject(models.Model):
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, blank=True)
+    last_page = models.IntegerField(default=1)

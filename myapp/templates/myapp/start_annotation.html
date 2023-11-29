@@ -1,9 +1,13 @@
 <!-- Template: start_annotation.html -->
 {% for review in page_obj %}
-    <!-- Display each review and provide a way for the student to annotate it -->
-    <p>{{ review.content }}</p>
-    <!-- Include annotation input fields -->
+    <div class="review">
+        <p>{{ review.content }}</p>
+        <!-- Add annotation controls here -->
+    </div>
 {% endfor %}
+
+<!-- Add pagination controls -->
+
 
 <!-- Pagination Controls -->
 <div class="pagination">

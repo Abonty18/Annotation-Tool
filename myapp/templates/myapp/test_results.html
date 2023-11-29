@@ -12,18 +12,14 @@
         <h1>Annotation Test Results</h1>
         <p>Your accuracy is: {{ accuracy }}%</p>
 
-        {% if accuracy > 90 %}
-            <!-- Button to start annotation if accuracy is greater than 90% -->
-            <a href="{% url 'start_annotation' %}" class="btn-start-annotation">Start Annotation</a>
+        <!-- Annotation Test Results Template -->
+        {% if accuracy >= 90 %}
+        <a href="{% url 'start_annotation' %}" class="button">Start Annotation</a>
         {% else %}
-            <!-- JavaScript to redirect to home if accuracy is not greater than 90% -->
-            <script type="text/javascript">
-                window.onload = function() {
-                    // Redirect to home page
-                    window.location.href = "{% url 'home' %}";
-                }
-            </script>
+            <a href="{% url 'home' %}" class="button">Get Back to Homepage</a>
         {% endif %}
+    
+
       
     </div>
 </body>

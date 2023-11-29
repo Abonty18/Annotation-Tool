@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['.vercel.app','.now.sh', '127.0.0.1','localhost']
 
-LOGIN_URL = 'become-annotator'  # Replace 'login' with the path to your login view
+# LOGIN_URL = 'become-annotator'  # Replace 'login' with the path to your login view
 
 # Application definition
 
@@ -86,13 +86,16 @@ DATABASES={
         "ENGINE": "django.db.backends.postgresql",
         "NAME": 'railway',
         "USER":'postgres',
-        "PASSWORD":'AEdcadFCB14cDfg*GcEef*426bcCc2dG',
+        "PASSWORD":'1131E62AcECaGgFbg*f*22fab4a*fBCG',
         "HOST":'roundhouse.proxy.rlwy.net',
-        "PORT":'46436'
+        "PORT":'38476'
 
     }
      
 }
+
+AUTH_USER_MODEL = 'myapp.CustomUser'
+
 
 
 # Password validation
@@ -112,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
-
+LOGIN_URL = 'sign_in'
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
