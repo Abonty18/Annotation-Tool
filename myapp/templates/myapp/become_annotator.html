@@ -1,33 +1,38 @@
 {% load static %}
 {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            {% if 'submit_test' not in message.tags %}
-                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endif %}
+<ul class="messages">
+    {% for message in messages %}
+    {% if 'submit_test' not in message.tags %}
+    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endif %}
         {% endfor %}
-    </ul>
+</ul>
 {% endif %}
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Become Annotator</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
+
 <body>
     <div class="container">
         <h1>Become an Annotator</h1>
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}  <!-- Render the form fields using {{ form.as_p }} -->
+            {{ form.as_p }} <!-- Render the form fields using {{ form.as_p }} -->
             <button type="submit" class="button">Submit</button>
         </form>
         <!-- Display a "Sign In" button and error message if the email already exists -->
         {% if 'Student with this Email already exists. Please sign in.' in messages %}
-            <p class="error-message">Student with this Email already exists. Please sign in.</p>
-            <a href="{% url 'sign_in' %}" class="button">Sign In</a>
+        <p class="error-message">Student with this Email already exists. Please sign in.</p>
+        <!-- Example in sign-in.html -->
+        <a href="{% url 'become_annotator' %}?next={{ next }}">Become an Annotator</a>
+
         {% endif %}
     </div>
 </body>
+
 </html>

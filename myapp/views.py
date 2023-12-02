@@ -16,6 +16,8 @@ from django.core.paginator import Paginator
 from .models import StudentAnnotation, UnannotatedReview
 from django.contrib.auth.decorators import login_required
 
+from django.shortcuts import get_object_or_404
+
 
 def load_reviews():
     file_path = os.path.join(settings.BASE_DIR, 'myapp', 'reviews.json')
@@ -29,18 +31,10 @@ def load_reviews():
                     'ground_truth_annotation': review_data['label']
                 }
             )
-
 @login_required
 def start_annotation(request):
     user = request.user  # Directly use the logged-in user
-
     page_number = request.GET.get('page', 1)
-
-    # Check if the user has an ongoing project
-    project, created = StudentProject.objects.get_or_create(student=user)
-
-    if not created:
-        page_number = project.last_page
 
     # Fetch reviews for annotation
     unannotated_reviews = UnannotatedReview.objects.all()
@@ -48,8 +42,7 @@ def start_annotation(request):
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'myapp/start_annotation.html', {
-        'page_obj': page_obj,
-        'project': project
+        'page_obj': page_obj
     })
 
 
@@ -95,19 +88,20 @@ def handle_annotation_submission(request):
 
     # If the request method is not POST or the 'action' is not 'save', redirect to another page
     return redirect('home')
-
-
-
 def become_annotator(request):
     # Clear any existing messages
     storage = messages.get_messages(request)
     storage.used = True
+
+    # Capture 'next' parameter from the request
+    next_page = request.GET.get('next', 'start_annotation')  # default to 'start_annotation' if 'next' is not provided
+
     if request.method == 'POST':
         form = StudentForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
 
-            # Check if the email already exists in Student model
+            # Check if the email already exists in the Student model
             if CustomUser.objects.filter(email=email).exists():
                 messages.error(request, 'Email already exists. Please sign in.')
                 return redirect('sign_in')  # Redirect to the sign-in page
@@ -115,21 +109,18 @@ def become_annotator(request):
             # Save the new Student
             form.save()
 
-            # Redirect to an appropriate page after registration
-            return redirect('start_test')
+            # Redirect to the next page after registration
+            return redirect(next_page)
     else:
         form = StudentForm()
 
-    return render(request, 'myapp/become_annotator.html', {'form': form})
-
-
-
-
+    return render(request, 'myapp/become_annotator.html', {'form': form, 'next': next_page})
 
 
 def index(request):
+    # Fetch all projects
+    projects = StudentProject.objects.all()
     return render(request, 'myapp/index.html')
-# myapp/views.py
 
 def start_test(request):
     # Fetch all reviews from the database
@@ -165,38 +156,28 @@ def create_project(request):
 #                 messages.error(request, 'Invalid email or password.')
 
 #     return render(request, 'myapp/sign_in.html')
-
 def sign_in(request):
+    # Capture 'next' parameter from the GET request and store it in the session
+    if request.method == 'GET' and 'next' in request.GET:
+        request.session['next'] = request.GET['next']
+
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
+        user = authenticate(request, username=email, password=password)
 
-        # Debugging
-        print("Email:", email)
-        print("Password:", password)
-
-        # user = authenticate(username=email, password=password)
-        # print("User:", user)  # Check if user is not None
-
-        # if user is not None:
-        #     login(request, user)
-        #     ## Get the 'next' parameter from the request
-        #     next_page = request.GET.get('next', 'start_annotation')
-        #     return redirect(next_page)
-        user = authenticate(username=email, password=password)
-        if user is not None and user.is_active:
+        if user is not None:
             login(request, user)
-            next_page = request.GET.get('next', 'start_annotation')
+            # Retrieve 'next' parameter from the session, with a default redirect if not found
+            next_page = request.session.get('next', 'default_redirect_url')
+            # Remove 'next' from the session after using it
+            request.session.pop('next', None)
             return redirect(next_page)
         else:
             messages.error(request, 'Invalid email or password.')
 
-
-        # else:
-        #     messages.error(request, 'Invalid email or password.')
-
-
     return render(request, 'myapp/sign_in.html')
+
 
 
 
