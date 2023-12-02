@@ -45,9 +45,6 @@ def start_annotation(request):
         'page_obj': page_obj
     })
 
-
-
-
 def handle_annotation_submission(request):
     if request.method == 'POST':
         student = request.user.student
@@ -84,30 +81,37 @@ def handle_annotation_submission(request):
                     project.save()
 
                 # Redirect to a confirmation page or back to the annotation page
-                return redirect('home')
+                return redirect('index')
 
     # If the request method is not POST or the 'action' is not 'save', redirect to another page
-    return redirect('home')
+    return redirect('index')
+from django.contrib.auth import get_user_model  # Import the user model
+
 def become_annotator(request):
     # Clear any existing messages
     storage = messages.get_messages(request)
     storage.used = True
 
     # Capture 'next' parameter from the request
-    next_page = request.GET.get('next', 'start_annotation')  # default to 'start_annotation' if 'next' is not provided
+    next_page = request.GET.get('next', 'start_test')  # default to 'start_annotation' if 'next' is not provided
 
     if request.method == 'POST':
         form = StudentForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
+            password = form.cleaned_data['password']  # Get the password from the form data
 
             # Check if the email already exists in the Student model
             if CustomUser.objects.filter(email=email).exists():
-                messages.error(request, 'Email already exists. Please sign in.')
+                messages.error(request, 'Student with this Email already exists. Please sign in.')
                 return redirect('sign_in')  # Redirect to the sign-in page
 
-            # Save the new Student
-            form.save()
+            # Create a new user with the custom user manager's create_user method
+            User = get_user_model()  # Get the custom user model
+            user = User.objects.create_user(email=email, password=password)
+
+            # Log in the user after registration
+            login(request, user)
 
             # Redirect to the next page after registration
             return redirect(next_page)
@@ -115,7 +119,6 @@ def become_annotator(request):
         form = StudentForm()
 
     return render(request, 'myapp/become_annotator.html', {'form': form, 'next': next_page})
-
 
 def index(request):
     # Fetch all projects
@@ -137,27 +140,9 @@ def start_test(request):
 
 
 def create_project(request):
-    # Your logic for creating a project
     return render(request, 'create_project.html')
-# myapp/views.py
 
-# def sign_in(request):
-#     if request.method == 'POST':
-#         email = request.POST.get('email')
-#         password = request.POST.get('password')
-
-#         if email and password:
-#             user = authenticate(username=email, password=password)
-#             if user is not None:
-#                 login(request, user)
-#                 # Redirect to the test or some other page
-#                 return redirect('start_test')
-#             else:
-#                 messages.error(request, 'Invalid email or password.')
-
-#     return render(request, 'myapp/sign_in.html')
 def sign_in(request):
-    # Capture 'next' parameter from the GET request and store it in the session
     if request.method == 'GET' and 'next' in request.GET:
         request.session['next'] = request.GET['next']
 
@@ -169,7 +154,7 @@ def sign_in(request):
         if user is not None:
             login(request, user)
             # Retrieve 'next' parameter from the session, with a default redirect if not found
-            next_page = request.session.get('next', 'default_redirect_url')
+            next_page = request.session.get('next', 'start_annotation')
             # Remove 'next' from the session after using it
             request.session.pop('next', None)
             return redirect(next_page)
@@ -178,15 +163,13 @@ def sign_in(request):
 
     return render(request, 'myapp/sign_in.html')
 
-
-
-
 def submit_test(request):
+    total_annotations = 0  # Initialize total_annotations
+    correct_count = 0  # Initialize correct_count
 
     if request.method == 'POST':
         user_annotations = {key: int(value) for key, value in request.POST.items() if key.startswith('annotation_')}
-        correct_count = 0
-        total_annotations = len(user_annotations)
+        total_annotations = len(user_annotations)  # Update total_annotations
 
         if total_annotations == 0:
             messages.error(request, 'No annotations were submitted.')
@@ -215,6 +198,7 @@ def submit_test(request):
         print("Total annotations:", total_annotations)
         print("Correct count:", correct_count)
         return redirect('start_test')
+
     
 
     

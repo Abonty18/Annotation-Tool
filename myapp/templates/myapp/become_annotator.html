@@ -20,6 +20,7 @@
 <body>
     <div class="container">
         <h1>Become an Annotator</h1>
+        
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }} <!-- Render the form fields using {{ form.as_p }} -->
