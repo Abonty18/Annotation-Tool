@@ -58,20 +58,28 @@ class UnannotatedReview(models.Model):
     content = models.TextField()
     # You can add more fields as needed
 
-class Annotation(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    review = models.ForeignKey(Review, on_delete=models.CASCADE)  # Assuming 'Review' is your review model
-    value = models.IntegerField()  # Stores the annotation value
-
-
-
 
 class StudentAnnotation(models.Model):
     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     review = models.ForeignKey(UnannotatedReview, on_delete=models.CASCADE)
-    annotation = models.TextField()  # or whatever field type is appropriate
+    annotation = models.TextField()  # Storing the review text
+    label = models.IntegerField(default=1)
+
 
 class StudentProject(models.Model):
     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, blank=True)
     last_page = models.IntegerField(default=1)
+
+class Annotation(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name='user_annotations')
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name='student_annotations')
+    review = models.ForeignKey(UnannotatedReview, on_delete=models.CASCADE)
+    value = models.IntegerField(null=True, blank=True)  # Stores the annotation value
+    label = models.CharField(max_length=100, null=True, blank=True)
+
+    class Meta:
+        unique_together = ('review', 'student')
+
+
+

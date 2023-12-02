@@ -1,10 +1,12 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Start Annotation</title>
     <link rel="stylesheet" href="{% static 'css/ann.css' %}"> <!-- Adjust the path as needed -->
 </head>
+
 <body>
     <div class="container">
         <h1 class="main-heading">Annotation</h1>
@@ -18,15 +20,19 @@
                     </tr>
                     <tr>
                         <td>Objective</td>
-                        <td>The goal of this annotation task is to categorize the reviews based on whether they are related to privacy features, privacy bugs, or neither.</td>
+                        <td>The goal of this annotation task is to categorize the reviews based on whether they are
+                            related to privacy features, privacy bugs, or neither.</td>
                     </tr>
                     <tr>
                         <td>Label Categories</td>
                         <td>
                             <ul>
-                                <li><strong>Privacy-Related Feature Request</strong> Assign this label if the review is discussing a feature request of the app related to user privacy.</li>
-                                <li><strong>Privacy-Related Bug</strong> Assign this label if the review is reporting a bug or issue related to user privacy.</li>
-                                <li><strong>Not Privacy-Related</strong> Assign this label if the review is not discussing any privacy-related aspects.</li>
+                                <li><strong>Privacy-Related Feature Request</strong> Assign this label if the review is
+                                    discussing a feature request of the app related to user privacy.</li>
+                                <li><strong>Privacy-Related Bug</strong> Assign this label if the review is reporting a
+                                    bug or issue related to user privacy.</li>
+                                <li><strong>Not Privacy-Related</strong> Assign this label if the review is not
+                                    discussing any privacy-related aspects.</li>
                             </ul>
                         </td>
                     </tr>
@@ -35,67 +41,78 @@
                         <td>
                             <ol>
                                 <li>Read the Review: Carefully read and understand the content of the review.</li>
-                                <li>Identify Privacy Context: Determine whether the review is discussing any issue related to user privacy.</li>
-                                <li>Assign Appropriate Label: Based on the content of the review, assign one of the three labels.</li>
+                                <li>Identify Privacy Context: Determine whether the review is discussing any issue
+                                    related to user privacy.</li>
+                                <li>Assign Appropriate Label: Based on the content of the review, assign one of the
+                                    three labels.</li>
                             </ol>
                         </td>
                     </tr>
                     <tr>
                         <td>Examples</td>
                         <td>
-                            Reviews like advising or requesting to update any privacy-related feature of the app should be labeled as Privacy-Related Feature Request. If a review reports personal data exposure due to a bug, label it as Privacy-Related Bug. Reviews discussing the app's user interface with no mention of privacy should be labeled as Not Privacy-Related.
+                            Reviews like advising or requesting to update any privacy-related feature of the app should
+                            be labeled as Privacy-Related Feature Request. If a review reports personal data exposure
+                            due to a bug, label it as Privacy-Related Bug. Reviews discussing the app's user interface
+                            with no mention of privacy should be labeled as Not Privacy-Related.
                         </td>
                     </tr>
                     <tr>
                         <td>Additional Notes</td>
                         <td>
-                            Focus on the main context if the review contains both privacy-related aspects and other topics. Use your best judgment if the review is ambiguous, and aim for consistency in labeling.
+                            Focus on the main context if the review contains both privacy-related aspects and other
+                            topics. Use your best judgment if the review is ambiguous, and aim for consistency in
+                            labeling.
                         </td>
                     </tr>
                 </table>
             </div>
             <div class="reviews">
+                <p>{{ review.content }}</p>
                 <h2>Reviews</h2>
-            <form method="post">
-                {% csrf_token %}
-                {% for review in page_obj %}
+                <form method="post">
+                    {% csrf_token %}
+                    {% for review in page_obj %}
                     <div class="review">
                         <p>{{ review.content }}</p>
-                        <!-- Radio buttons for annotation -->
+            
                         <div>
-                            <input type="radio" id="option1_{{ review.id }}" name="annotation_{{ review.id }}" value="1">
-                            <label for="option1_{{ review.id }}">Option 1</label><br>
-
-                            <input type="radio" id="option2_{{ review.id }}" name="annotation_{{ review.id }}" value="2">
-                            <label for="option2_{{ review.id }}">Option 2</label><br>
-
-                            <input type="radio" id="option3_{{ review.id }}" name="annotation_{{ review.id }}" value="3">
-                            <label for="option3_{{ review.id }}">Option 3</label>
+                            <input type="radio" id="option1_{{ review.id }}" name="annotation_{{ review.id }}"
+                                value="1">
+                            <label for="option1_{{ review.id }}">Privacy-Related Feature Request</label><br>
+            
+                            <input type="radio" id="option2_{{ review.id }}" name="annotation_{{ review.id }}"
+                                value="2">
+                            <label for="option2_{{ review.id }}">Privacy-Related Bug</label><br>
+            
+                            <input type="radio" id="option3_{{ review.id }}" name="annotation_{{ review.id }}"
+                                value="3">
+                            <label for="option3_{{ review.id }}">Not Privacy-Related</label>
                         </div>
                     </div>
-                {% endfor %}
-                <!-- Pagination Controls -->
-                <div class="pagination">
-                    <span class="step-links">
-                        {% if page_obj.has_previous %}
+                    {% endfor %} <!-- Close the loop for page_obj here -->
+             
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if page_obj.has_previous %}
                             <button type="submit" name="action" value="previous">Previous</button>
-                        {% endif %}
-
-                        <span class="current">
-                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                        </span>
-
-                        {% if page_obj.has_next %}
+                            {% endif %}
+            
+                            <span class="current">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                            </span>
+            
+                            {% if page_obj.has_next %}
                             <button type="submit" name="action" value="next">Next</button>
-                        {% endif %}
-                    </span>
-                </div>
-
-                <!-- Save Button -->
-                <button type="submit" class="savebtn" name="action" value="save">Save</button>
-            </form>
+                            {% endif %}
+                        </span>
+                    </div>
+            
+                    <button type="submit" class="savebtn" name="action" value="save">Save</button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 </body>
+
 </html>

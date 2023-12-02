@@ -13,7 +13,7 @@
         <p>Your accuracy is: {{ accuracy }}%</p>
 
         <!-- Annotation Test Results Template -->
-        {% if accuracy >= 90 %}
+        {% if accuracy >= 80 %}
         <a href="{% url 'start_annotation' %}" class="button">Start Annotation</a>
         {% else %}
             <a href="{% url 'index' %}" class="button">Get Back to Homepage</a>

@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate, login
 from myapp.models import Review
 import json
 import random
+from django.db.models import Count
+from django.contrib.auth import get_user_model  # Import the user model
 from django.contrib.auth.models import User
 from .models import StudentProject
 from .forms import StudentForm
@@ -15,10 +17,16 @@ from .models import Review
 from django.core.paginator import Paginator
 from .models import StudentAnnotation, UnannotatedReview
 from django.contrib.auth.decorators import login_required
-
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
-
+def get_review_for_annotation():
+    # Get reviews with less than 3 annotations, prioritized by annotation count
+    return UnannotatedReview.objects.annotate(
+        annotation_count=Count('annotation')
+    ).filter(
+        annotation_count__lt=3
+    ).order_by('annotation_count').first()
 def load_reviews():
     file_path = os.path.join(settings.BASE_DIR, 'myapp', 'reviews.json')
     with open(file_path, 'r') as file:
@@ -33,59 +41,64 @@ def load_reviews():
             )
 @login_required
 def start_annotation(request):
-    user = request.user  # Directly use the logged-in user
+    user = request.user
     page_number = request.GET.get('page', 1)
 
-    # Fetch reviews for annotation
-    unannotated_reviews = UnannotatedReview.objects.all()
+    # Fetch UnannotatedReview objects with less than 3 annotations
+    unannotated_reviews = UnannotatedReview.objects.annotate(
+        annotation_count=Count('studentannotation')
+    ).filter(
+        annotation_count__lt=3
+    )
+    print("Number of reviews fetched: ", unannotated_reviews.count())
+    for review in unannotated_reviews:
+        print("Review ID:", review.id, "Annotation Count:", review.annotation_count)
+
+    # Randomize the order of reviews
+    unannotated_reviews = sorted(unannotated_reviews, key=lambda x: random.random())
+
     paginator = Paginator(unannotated_reviews, 10)
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'myapp/start_annotation.html', {
-        'page_obj': page_obj
-    })
+    # Add information about the students who have annotated each review
+    for review in page_obj:
+        review.student_annotations = review.studentannotation_set.all()
+
+    return render(request, 'myapp/start_annotation.html', {'page_obj': page_obj})
+
+
 
 def handle_annotation_submission(request):
     if request.method == 'POST':
-        student = request.user.student
-        project, _ = StudentProject.objects.get_or_create(student=student)
+        print(request.POST) 
+        # Get the student making the annotation (you may have a different way of identifying the student)
+        student = request.user  # Assuming you have a user system in place
 
-        if 'action' in request.POST:
-            if request.POST['action'] == 'save':
-                # Process each annotation in the form data
-                for key, value in request.POST.items():
-                    if key.startswith('annotation_'):
-                        review_id = int(key.split('_')[1])  # Extracting review ID
-                        annotation_content = value
+        # Iterate through the POST data to process annotations
+        for key, value in request.POST.items():
+            if key.startswith('annotation_'):
+                review_id = int(key.split('_')[1])  # Extract the review ID
+                label = int(value)  # Extract the selected label
 
-                        # Retrieve or create the corresponding UnannotatedReview
-                        review, _ = UnannotatedReview.objects.get_or_create(id=review_id)
+                # Get or create the StudentAnnotation object
+                annotation, created = StudentAnnotation.objects.get_or_create(
+                    student=student,
+                    review_id=review_id,
+                    defaults={'label': label}
+                )
 
-                        # Create or update the StudentAnnotation
-                        StudentAnnotation.objects.update_or_create(
-                            student=student,
-                            review=review,
-                            defaults={'annotation': annotation_content}
-                        )
+                # Update the label if the annotation already exists
+                if not created:
+                    annotation.label = label
+                    annotation.save()
 
-                # Update the project's last page if provided
-                page_number = request.POST.get('page_number')
-                if page_number:
-                    project.last_page = int(page_number)
-                    project.save()
+        # Redirect to a success page or the next set of reviews
+        return redirect('start_annotation')  # Replace 'success_page' with the appropriate URL name
 
-                # Check if there's a project name to be saved
-                project_name = request.POST.get('project_name')
-                if project_name:
-                    project.name = project_name
-                    project.save()
+# Handle other cases like GET requests or invalid form submissions
+    return render(request, 'start_annotation.html')  # Replace 'annotation_page.html' with your template name
 
-                # Redirect to a confirmation page or back to the annotation page
-                return redirect('index')
 
-    # If the request method is not POST or the 'action' is not 'save', redirect to another page
-    return redirect('index')
-from django.contrib.auth import get_user_model  # Import the user model
 
 def become_annotator(request):
     # Clear any existing messages

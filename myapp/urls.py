@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
-from myapp.views import index, create_project, become_annotator, start_test, submit_test, test_results, sign_in, start_annotation
+from myapp.views import index, create_project, become_annotator,handle_annotation_submission, start_test, submit_test, test_results, sign_in, start_annotation
 
 urlpatterns = [
     # path('', index, name='home'),
@@ -11,7 +11,9 @@ urlpatterns = [
     path('test_results/', test_results, name='test_results'),
     path('sign-in/', views.sign_in, name='sign_in'),
     path('become-annotator/', views.become_annotator, name='become_annotator'),
-    path('annotate/', views.start_annotation, name='start_annotation'),
+    path('annotate/', views.handle_annotation_submission, name='handle_annotation_submission'),
+    path('start_annotation/', views.start_annotation, name='start_annotation'),
+
     path('', views.index, name='index'),
     
     # Other paths as needed...

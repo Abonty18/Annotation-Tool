@@ -28,11 +28,28 @@ DEBUG = True
 ALLOWED_HOSTS = ['.vercel.app','.now.sh', '127.0.0.1','localhost']
 
 # LOGIN_URL = 'become-annotator'  # Replace 'login' with the path to your login view
+# settings.py
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
 
 # Application definition
 
 INSTALLED_APPS = [
-      'myapp',
+    'myapp',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
