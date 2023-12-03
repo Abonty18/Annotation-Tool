@@ -162,7 +162,7 @@ def start_test(request):
     reviews = Review.objects.all()
 
     # Get the count of reviews or 10, whichever is smaller
-    count = min(reviews.count(), 5)
+    count = min(reviews.count(), 15)
 
     # Select random reviews
     random_reviews = random.sample(list(reviews), count)
