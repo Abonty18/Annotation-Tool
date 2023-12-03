@@ -56,7 +56,8 @@ class Review(models.Model):
 
 class UnannotatedReview(models.Model):
     content = models.TextField()
-    # You can add more fields as needed
+    annotation_count = models.IntegerField(default=0)  # New field to count annotations
+
 
 
 class StudentAnnotation(models.Model):

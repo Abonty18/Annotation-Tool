@@ -13,6 +13,8 @@ urlpatterns = [
     path('become-annotator/', views.become_annotator, name='become_annotator'),
     path('annotate/', views.handle_annotation_submission, name='handle_annotation_submission'),
     path('start_annotation/', views.start_annotation, name='start_annotation'),
+    path('enter-password/', views.enter_password, name='enter_password'),
+
 
     path('', views.index, name='index'),
     
