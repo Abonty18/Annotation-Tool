@@ -58,13 +58,23 @@ class UnannotatedReview(models.Model):
     content = models.TextField()
     annotation_count = models.IntegerField(default=0)  # New field to count annotations
 
-
-
 class StudentAnnotation(models.Model):
-    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     review = models.ForeignKey(UnannotatedReview, on_delete=models.CASCADE)
-    annotation = models.TextField()  # Storing the review text
-    label = models.IntegerField(default=1)
+
+    # Student fields
+    student1 = models.ForeignKey(CustomUser, related_name='student1_annotations', null=True, blank=True, on_delete=models.CASCADE)
+    student2 = models.ForeignKey(CustomUser, related_name='student2_annotations', null=True, blank=True, on_delete=models.CASCADE)
+    student3 = models.ForeignKey(CustomUser, related_name='student3_annotations', null=True, blank=True, on_delete=models.CASCADE)
+
+    # Annotation fields
+    student1annotation = models.IntegerField(null=True, blank=True)
+    student2annotation = models.IntegerField(null=True, blank=True)
+    student3annotation = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        unique_together = [('review', 'student1'), ('review', 'student2'), ('review', 'student3')]
+
+
 
 
 class StudentProject(models.Model):

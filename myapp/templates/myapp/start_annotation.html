@@ -70,7 +70,7 @@
             <div class="reviews">
                 <p>{{ review.content }}</p>
                 <h2>Reviews</h2>
-                <form method="post">
+                <form method="post" action="{% url 'handle_annotation_submission' %}">
                     {% csrf_token %}
                     {% for review in page_obj %}
                     <div class="review">
