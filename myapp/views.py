@@ -7,6 +7,7 @@ from .forms import StudentForm
 from .models import CustomUser
 from django.contrib.auth import authenticate, login
 from myapp.models import Review
+from django.contrib.auth import logout
 import json
 import random
 from django.db.models import Count, Case, When, IntegerField
@@ -22,6 +23,8 @@ from .models import StudentAnnotation, UnannotatedReview
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator
+
 
 from django.db.models import Case, When, Value
 
@@ -70,28 +73,58 @@ def load_reviews():
                     'ground_truth_annotation': review_data['label']
                 }
             )
+
+def sign_out(request):
+ logout(request)
+ return redirect('index') 
+
 @login_required
 def start_annotation(request):
     user = request.user
-    page_number = request.GET.get('page', 1)
-
     unannotated_reviews = get_prioritized_reviews_for_annotation(user)
-    paginator = Paginator(unannotated_reviews, 10)
+
+    paginator = Paginator(unannotated_reviews, 1)
+    page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
+    # Fetch the current review id
+    current_review_id = None
+    if page_obj.object_list:
+        current_review = page_obj.object_list[0]
+        current_review_id = current_review.id
+
+    # Retrieve the selections from the session
+    selections = request.session.get('selections', {})
+    selected_option = selections.get(str(current_review_id))  # Ensure this is a string key
+
     return render(request, 'myapp/start_annotation.html', {
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'selected_option': selected_option
     })
+
+
+
 
 @login_required
 def handle_annotation_submission(request):
     if request.method == 'POST':
         student = request.user
+        action = request.POST.get('action')
+        current_page = int(request.POST.get('current_page', 1))
+        selections = request.session.get('selections', {})
+        if action == 'save':
+            # Logic to save and exit
+            current_page = request.POST.get('current_page', 1)
+            StudentProject.objects.filter(student=student).update(last_page=current_page)
+            messages.success(request, "Your progress has been saved.")
+            return redirect('sign_out')  # Redirect to the sign-out page
 
+        # Logic to handle annotations and navigation
         for key, value in request.POST.items():
             if key.startswith('annotation_'):
-                review_id = key.split('_')[1]
-                annotation_value = int(value)
+                review_id = int(key.split('_')[1])
+                annotation_value = value
+                selections[review_id] = annotation_value
                 review = get_object_or_404(UnannotatedReview, id=review_id)
 
                 # Check if the student has already annotated this review
@@ -138,11 +171,31 @@ def handle_annotation_submission(request):
                 review.save()
 
                 messages.success(request, f"Annotation for review {review_id} saved successfully.")
+        request.session['selections'] = selections
+
+        # Handling navigation
+        if action in ['next', 'previous']:
+            current_page = int(request.POST.get('current_page', 1))
+            if action == 'next':
+            # Store the selection for the current page
+              for key, value in request.POST.items():
+                if key.startswith('annotation_'):
+                    selections[current_page] = (key, value)
+              current_page += 1
+            elif action == 'previous' and current_page > 1:
+              current_page -= 1
+
+        # Save the selections back to the session
+            request.session['selections'] = selections
+            request.session['last_page'] = current_page  # Save the last page in the session
+
+            return redirect(f"{reverse('start_annotation')}?page={current_page}")
 
         return redirect('start_annotation')
     else:
         messages.error(request, "You must submit the form with the POST method.")
         return redirect('start_annotation')
+
 
 
 
@@ -190,11 +243,11 @@ def become_annotator(request):
             login(request, user)
 
             # Redirect to the next page after registration
-            return redirect(next_page)
+            return redirect('start_annotation')
     else:
         form = StudentForm()
 
-    return render(request, 'myapp/become_annotator.html', {'form': form, 'next': next_page})
+    return render(request, 'myapp/become_annotator.html', {'form': form, 'next':start_annotation})
 
 def index(request):
     # Fetch all projects
@@ -293,5 +346,4 @@ def test_results(request):
     # Passing a default or dummy accuracy value
     dummy_accuracy = 0  # You can change this as needed
     return render(request, 'myapp/test_results.html', {'accuracy': dummy_accuracy})
-
 

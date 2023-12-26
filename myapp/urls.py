@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path
+from .views import sign_out
 from . import views
 from myapp.views import index, create_project, become_annotator,handle_annotation_submission, start_test, submit_test, test_results, sign_in, start_annotation
 
@@ -14,6 +15,7 @@ urlpatterns = [
     path('annotate/', views.handle_annotation_submission, name='handle_annotation_submission'),
     path('start_annotation/', views.start_annotation, name='start_annotation'),
     path('enter-password/', views.enter_password, name='enter_password'),
+    path('sign-out/', sign_out, name='sign_out'),
 
 
     path('', views.index, name='index'),

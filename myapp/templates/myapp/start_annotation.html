@@ -75,44 +75,65 @@
                     {% for review in page_obj %}
                     <div class="review">
                         <p>{{ review.content }}</p>
-            
                         <div>
-                            <input type="radio" id="option1_{{ review.id }}" name="annotation_{{ review.id }}"
-                                value="1">
+                            <input type="radio" id="option1_{{ review.id }}" name="annotation_{{ review.id }}" value="1"
+                                {% if selected_option == "1" %}checked{% endif %}>
                             <label for="option1_{{ review.id }}">Privacy-Related Feature Request</label><br>
-            
-                            <input type="radio" id="option2_{{ review.id }}" name="annotation_{{ review.id }}"
-                                value="2">
+
+                            <input type="radio" id="option2_{{ review.id }}" name="annotation_{{ review.id }}" value="2"
+                                {% if selected_option == "2" %}checked{% endif %}>
                             <label for="option2_{{ review.id }}">Privacy-Related Bug</label><br>
-            
-                            <input type="radio" id="option3_{{ review.id }}" name="annotation_{{ review.id }}"
-                                value="3">
+
+                            <input type="radio" id="option3_{{ review.id }}" name="annotation_{{ review.id }}" value="3"
+                                {% if selected_option == "3" %}checked{% endif %}>
                             <label for="option3_{{ review.id }}">Not Privacy-Related</label>
                         </div>
                     </div>
-                    {% endfor %} <!-- Close the loop for page_obj here -->
-             
+                    {% endfor %}
+
+
+                    <!-- Close the loop for page_obj here -->
+
+                    <input type="hidden" name="current_page" value="{{ page_obj.number }}">
+
                     <div class="pagination">
-                        <span class="step-links">
-                            {% if page_obj.has_previous %}
-                            <button type="submit" name="action" value="previous">Previous</button>
-                            {% endif %}
-            
-                            <span class="current">
-                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                            </span>
-            
-                            {% if page_obj.has_next %}
-                            <button type="submit" name="action" value="next">Next</button>
-                            {% endif %}
-                        </span>
+                        {% if page_obj.has_previous %}
+                        <button type="submit" name="action" value="previous">Previous</button>
+                        {% endif %}
+                        {% if page_obj.has_next %}
+                        <button type="submit" name="action" value="next">Next</button>
+                        {% endif %}
                     </div>
-            
-                    <button type="submit" class="savebtn" name="action" value="save">Save</button>
+
+                    <button type="submit" name="action" value="save">Save</button>
                 </form>
             </div>
-        </div>
-    </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.querySelector('form').onsubmit = function () {
+                        let action = document.querySelector('button[type="submit"][clicked=true]').value;
+                        if (action === 'next') {
+                            let hasSelected = false;
+                            document.querySelectorAll('input[type="radio"]').forEach(function (radio) {
+                                if (radio.checked) {
+                                    hasSelected = true;
+                                }
+                            });
+                            if (!hasSelected) {
+                                alert('Please select an option before moving to the next review.');
+                                return false;
+                            }
+                        }
+                        return true;
+                    };
+                    document.querySelectorAll('button[type="submit"]').forEach(button => {
+                        button.addEventListener('click', function () {
+                            document.querySelectorAll('button[type="submit"]').forEach(btn => btn.removeAttribute('clicked'));
+                            this.setAttribute('clicked', 'true');
+                        });
+                    });
+                });
+            </script>
 </body>
 
 </html>
