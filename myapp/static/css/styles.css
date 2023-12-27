@@ -1,26 +1,31 @@
-/* static/css/styles.css */
+/* myapp/static/css/style.css */
 body {
-     font-family: Arial, sans-serif;
-     text-align: center;
-     padding: 50px;
- }
- 
- .container {
-     width: 80%;
-     margin: auto;
- }
- 
- .button {
-     display: inline-block;
-     padding: 10px 20px;
-     margin: 10px;
-     background-color: #007bff;
-     color: white;
-     text-decoration: none;
-     border-radius: 5px;
- }
- 
- .button:hover {
-     background-color: #0056b3;
- }
- 
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+.button {
+    background-color: #0d6efd;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #0a58ca;
+}
+
+.error-message {
+    color: red;
+}
+
+/* Add more of your styles here */

@@ -273,21 +273,7 @@ def start_test(request):
 def create_project(request):
     return render(request, 'create_project.html')
 
-# def sign_in(request):
-#     if request.method == 'POST':
-#         email = request.POST.get('email')
 
-#         # Check if the email exists in the database
-#         if CustomUser.objects.filter(email=email).exists():
-#             # Store email in session and redirect to password page
-#             request.session['email_for_signin'] = email
-#             return redirect('enter_password')
-#         else:
-#             # Email does not exist, show message to become an annotator
-#             messages.info(request, "You are not a listed annotator for this project. Please signup first to become an annotator.")
-#             return redirect('become_annotator')
-
-#     return render(request, 'myapp/sign_in.html')
 def sign_in(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -297,7 +283,7 @@ def sign_in(request):
             return redirect('enter_password')
         else:
             # Redirect to become-annotator with email as query parameter
-            messages.info(request, "You are not a listed annotator for this project. Please signup first to become an annotator.")
+            # messages.info(request, "You are not a listed annotator for this project. Please signup first to become an annotator.")
             return redirect(f"{reverse('become_annotator')}?email={email}")
 
     return render(request, 'myapp/sign_in.html')

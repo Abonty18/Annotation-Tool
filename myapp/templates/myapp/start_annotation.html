@@ -4,6 +4,9 @@
 
 <head>
     <title>Start Annotation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&family=Nunito+Sans:opsz@6..12&family=Oswald&family=PT+Sans&family=Playfair+Display&family=Poppins:wght@300&family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/ann.css' %}"> <!-- Adjust the path as needed -->
 </head>
 
@@ -27,11 +30,13 @@
                         <td>Label Categories</td>
                         <td>
                             <ul>
-                                <li><strong>Privacy-Related Feature Request</strong> Assign this label if the review is
-                                    discussing a feature request of the app related to user privacy.</li>
-                                <li><strong>Privacy-Related Bug</strong> Assign this label if the review is reporting a
-                                    bug or issue related to user privacy.</li>
-                                <li><strong>Not Privacy-Related</strong> Assign this label if the review is not
+                                <li><strong>Privacy-Related Feature Request</strong>: Assign this label if the review
+                                    discusses a feature request related to user privacy.</li>
+                                <li><strong>Privacy-Related Bug</strong>: Assign this label if the review reports a bug
+                                    related to user privacy.</li>
+                                <li><strong>Privacy-Related Feature Request+Bug</strong>: Assign this label if the
+                                    review discusses both a feature request and a bug related to user privacy.</li>
+                                <li><strong>Not Privacy-Related</strong>: Assign this label if the review is not
                                     discussing any privacy-related aspects.</li>
                             </ul>
                         </td>
@@ -83,10 +88,12 @@
                             <input type="radio" id="option2_{{ review.id }}" name="annotation_{{ review.id }}" value="2"
                                 {% if selected_option == "2" %}checked{% endif %}>
                             <label for="option2_{{ review.id }}">Privacy-Related Bug</label><br>
-
                             <input type="radio" id="option3_{{ review.id }}" name="annotation_{{ review.id }}" value="3"
                                 {% if selected_option == "3" %}checked{% endif %}>
-                            <label for="option3_{{ review.id }}">Not Privacy-Related</label>
+                            <label for="option3_{{ review.id }}">Privacy-Related Feature Request+Bug</label><br>
+                            <input type="radio" id="option4_{{ review.id }}" name="annotation_{{ review.id }}" value="4"
+                                {% if selected_option == "4" %}checked{% endif %}>
+                            <label for="option4_{{ review.id }}">Not Privacy-Related</label>
                         </div>
                     </div>
                     {% endfor %}

@@ -5,19 +5,20 @@
 
 <head>
     <title>Landing Page</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&family=Nunito+Sans:opsz@6..12&family=Oswald&family=PT+Sans&family=Playfair+Display&family=Poppins:wght@300&family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
 </head>
-
 <body>
     <div class="container">
-
-        <h1>Welcome to the Annotation Tool</h1>
-        <!-- In your template file -->
-        <!-- In your template file -->
-        <a href="{% url 'sign_in' %}?next={% url 'start_annotation' %}">Start Annotation</a>
-
-
+        <div class="left-content">
+            <h1>Welcome to the Annotation Tool</h1>
+            <a href="{% url 'sign_in' %}?next={% url 'start_annotation' %}" class="start-button">Start Annotation</a>
+        </div>
+        <div class="right-content">
+            <img src="{% static 'image/welcome.png' %}" alt="Annotation Tool Image">
+        </div>
     </div>
 </body>
-
 </html>

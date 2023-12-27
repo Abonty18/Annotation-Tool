@@ -1,0 +1,61 @@
+body {
+     font-family: 'Nunito Sans', sans-serif;
+     margin: 0;
+     padding: 0;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     background-color: #cbb2ff;
+     color: #5f089d;
+     font-weight: 600;
+ }
+ 
+ .container {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     min-height: 100vh;
+     padding: 20px;
+ }
+ 
+ .left-content, .right-content {
+     flex: 1;
+ }
+ 
+ .left-content {
+     padding: 20px;
+ }
+ 
+ .right-content img {
+     width: 100%;
+     height: auto;
+ }
+ 
+ .button {
+     background-color: #9e62ff;
+     color: white;
+     padding: 10px 15px;
+     border: none;
+     border-radius: 4px;
+     cursor: pointer;
+ }
+ 
+ .button:hover {
+     background-color: #8034fc;
+ }
+ 
+ .error-message {
+     color: red;
+ }
+ 
+ .form-errors {
+     color: red;
+ }
+
+
+ form{
+     background-color: aliceblue;
+     padding: 10pt;
+     border-radius: 10px;
+ }
+ 

@@ -14,31 +14,34 @@
 
 <head>
     <title>Become Annotator</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&family=Nunito+Sans:opsz@6..12&family=Oswald&family=PT+Sans&family=Playfair+Display&family=Poppins:wght@300&family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
 </head>
 
 <body>
     <div class="container">
-        <h1>Become an Annotator</h1>
-
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }} <!-- Render the form fields using {{ form.as_p }} -->
-            <button type="submit" class="button">Submit</button>
-        </form>
-        <!-- Display a "Sign In" button and error message if the email already exists -->
-        {% if 'Student with this Email already exists. Please sign in.' in messages %}
-        <p class="error-message">Student with this Email already exists. Please sign in.</p>
-        <!-- Example in sign-in.html -->
-        <a href="{% url 'become_annotator' %}?next={{ next }}">Become an Annotator</a>
-
-        {% endif %}
-        {% if form.errors %}
-        <div class="form-errors">
-            {{ form.errors }}
+        <div class="left-content">
+            <h1>Become an Annotator</h1>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="button">Submit</button>
+            </form>
+            {% if 'Student with this Email already exists. Please sign in.' in messages %}
+            <p class="error-message">Student with this Email already exists. Please sign in.</p>
+            <a href="{% url 'become_annotator' %}?next={{ next }}">Become an Annotator</a>
+            {% endif %}
+            {% if form.errors %}
+            <div class="form-errors">
+                {{ form.errors }}
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
+        <div class="right-content">
+            <img src="{% static 'image/signup.png' %}" alt="Descriptive Alt Text">
+        </div>
     </div>
 </body>
-
 </html>

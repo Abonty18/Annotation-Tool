@@ -1,4 +1,16 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    background-color: #122b35;
+    color: #333;
+}
 .container {
+    background-color: #bfc21d;
     width: 90%;
     margin: auto;
     max-width: 1200px;
@@ -23,7 +35,6 @@
     padding-right: 20px; /* Space between columns */
 }
 
-
 .review {
     margin-bottom: 20px;
     padding: 10px;
@@ -31,12 +42,27 @@
     border-radius: 5px;
     background-color: rgb(149, 248, 215);
 }
+
 .review p {
     font-size: 1.1em;
 }
+
 .annotations {
     margin-top: 10px;
+    display: flex;
+    flex-direction: column;
 }
+
+.annotations label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+input[type="radio"] {
+    margin-right: 5px;
+}
+
 .submit-btn {
     margin-top: 20px;
     padding: 10px 20px;
@@ -47,6 +73,7 @@
     border-radius: 5px;
     cursor: pointer;
 }
+
 .guidelines table {
     width: 100%;
     border-collapse: collapse;
@@ -68,12 +95,13 @@
     margin: 0;
     padding-left: 20px;
 }
+
 .pagination {
     text-align: center;
     margin-top: 20px;
 }
 
-.savebtn{
+.savebtn {
     background-color: #4CAF50;
     border: none;
     color: white;
@@ -87,10 +115,6 @@
     border-radius: 5px;
 }
 
-.button:hover, button:hover {
+.button:hover, .savebtn:hover {
     background-color: #45a049;
-}
-
-input[type="radio"] {
-    margin-right: 5px;
 }
