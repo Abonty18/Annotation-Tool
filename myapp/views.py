@@ -28,6 +28,8 @@ from django.core.paginator import Paginator
 
 from django.db.models import Case, When, Value
 
+
+
 def get_prioritized_reviews_for_annotation(user):
     # Fetch reviews that have less than 3 annotations and not annotated by the current user
     return UnannotatedReview.objects.annotate(
@@ -40,7 +42,7 @@ def get_prioritized_reviews_for_annotation(user):
         studentannotation__student3=user
     ).filter(
         num_annotations__lt=3
-    ).order_by('?')  # Random order
+    ).order_by('-num_annotations')
 
 
 
