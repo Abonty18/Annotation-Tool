@@ -170,7 +170,7 @@ def handle_annotation_submission(request):
                 review.annotation_count = StudentAnnotation.objects.filter(review=review).count()
                 review.save()
 
-                messages.success(request, f"Annotation for review {review_id} saved successfully.")
+                # messages.success(request, f"Annotation for review {review_id} saved successfully.")
         request.session['selections'] = selections
 
         # Handling navigation
