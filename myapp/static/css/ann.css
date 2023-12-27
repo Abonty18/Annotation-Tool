@@ -1,21 +1,29 @@
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito Sans', sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Full viewport height */
-    background-color: #122b35;
-    color: #333;
+    background-color: #cbb2ff;
+    color: #5f089d;
+    font-weight: 600;
 }
+
 .container {
-    background-color: #bfc21d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+/* .container {
+    font-family: 'Nunito Sans', sans-serif;
     width: 90%;
     margin: auto;
     max-width: 1200px;
-    text-align: center; /* Center the main heading */
-}
+    text-align: center; 
+} */
 
 .main-heading {
     margin-bottom: 20px; /* Spacing below the main heading */
@@ -40,7 +48,7 @@ body {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    background-color: rgb(149, 248, 215);
+    background-color: rgb(32, 98, 76);
 }
 
 .review p {
