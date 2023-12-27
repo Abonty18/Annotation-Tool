@@ -161,7 +161,7 @@ def handle_annotation_submission(request):
                         annotation.student3 = student
                         annotation.student3annotation = annotation_value
                     else:
-                        messages.error(request, f"Review {review_id} already has 3 annotations by different students.")
+                        # messages.error(request, f"Review {review_id} already has 3 annotations by different students.")
                         continue
 
                 annotation.save()
