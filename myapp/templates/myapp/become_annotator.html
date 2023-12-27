@@ -20,7 +20,7 @@
 <body>
     <div class="container">
         <h1>Become an Annotator</h1>
-        
+
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }} <!-- Render the form fields using {{ form.as_p }} -->
@@ -32,6 +32,11 @@
         <!-- Example in sign-in.html -->
         <a href="{% url 'become_annotator' %}?next={{ next }}">Become an Annotator</a>
 
+        {% endif %}
+        {% if form.errors %}
+        <div class="form-errors">
+            {{ form.errors }}
+        </div>
         {% endif %}
     </div>
 </body>

@@ -221,33 +221,35 @@ def become_annotator(request):
     storage = messages.get_messages(request)
     storage.used = True
 
-    # Capture 'next' parameter from the request
-    next_page = request.GET.get('next', 'start_test')  # default to 'start_annotation' if 'next' is not provided
+    next_page = request.GET.get('next', 'start_test') 
+    email = request.GET.get('email', '')
+    form = StudentForm(initial={'email': email})
 
     if request.method == 'POST':
         form = StudentForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            password = form.cleaned_data['password']  # Get the password from the form data
+            password = form.cleaned_data['password']
+            department = form.cleaned_data['department']
+            # No need to check if the email exists here, as it's already handled in the form's clean method
+            has_taken_course = form.cleaned_data['has_taken_software_course']
+            User = get_user_model() 
+            user = User.objects.create_user(email=email, password=password, department=department, has_taken_software_course=has_taken_course)
+            user.save()
 
-            # Check if the email already exists in the Student model
-            if CustomUser.objects.filter(email=email).exists():
-                messages.error(request, 'Student with this Email already exists. Please sign in.')
-                return redirect('sign_in')  # Redirect to the sign-in page
-
-            # Create a new user with the custom user manager's create_user method
-            User = get_user_model()  # Get the custom user model
-            user = User.objects.create_user(email=email, password=password)
-
-            # Log in the user after registration
             login(request, user)
-
-            # Redirect to the next page after registration
             return redirect('start_annotation')
+        else:
+            # Handle form errors
+            for field in form.errors:
+                form[field].field.widget.attrs['class'] = 'error'
+            # Log the errors for debugging
+            print(form.errors)
     else:
         form = StudentForm()
 
-    return render(request, 'myapp/become_annotator.html', {'form': form, 'next':start_annotation})
+    return render(request, 'myapp/become_annotator.html', {'form': form, 'next': 'start_annotation'})
+
 
 def index(request):
     # Fetch all projects
@@ -271,21 +273,36 @@ def start_test(request):
 def create_project(request):
     return render(request, 'create_project.html')
 
+# def sign_in(request):
+#     if request.method == 'POST':
+#         email = request.POST.get('email')
+
+#         # Check if the email exists in the database
+#         if CustomUser.objects.filter(email=email).exists():
+#             # Store email in session and redirect to password page
+#             request.session['email_for_signin'] = email
+#             return redirect('enter_password')
+#         else:
+#             # Email does not exist, show message to become an annotator
+#             messages.info(request, "You are not a listed annotator for this project. Please signup first to become an annotator.")
+#             return redirect('become_annotator')
+
+#     return render(request, 'myapp/sign_in.html')
 def sign_in(request):
     if request.method == 'POST':
         email = request.POST.get('email')
 
-        # Check if the email exists in the database
         if CustomUser.objects.filter(email=email).exists():
-            # Store email in session and redirect to password page
             request.session['email_for_signin'] = email
             return redirect('enter_password')
         else:
-            # Email does not exist, show message to become an annotator
+            # Redirect to become-annotator with email as query parameter
             messages.info(request, "You are not a listed annotator for this project. Please signup first to become an annotator.")
-            return redirect('become_annotator')
+            return redirect(f"{reverse('become_annotator')}?email={email}")
 
     return render(request, 'myapp/sign_in.html')
+
+
 def enter_password(request):
     if request.method == 'POST':
         email = request.session.get('email_for_signin')

@@ -35,7 +35,7 @@ class CustomUser(AbstractUser):
         ('btm', 'BTM'),
         # ... other departments ...
     ]
-    department = models.CharField(max_length=100, choices=DEPARTMENT_CHOICES, default='default_department_value')
+    department = models.CharField(max_length=100, choices=DEPARTMENT_CHOICES)
 
     has_taken_software_course = models.BooleanField(default=False)
 

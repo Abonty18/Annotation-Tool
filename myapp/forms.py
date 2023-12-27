@@ -4,7 +4,7 @@ from .models import CustomUser
 
 class StudentForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
-    has_taken_software_engineering_course = forms.TypedChoiceField(
+    has_taken_software_course = forms.TypedChoiceField(
         coerce=lambda x: x == 'True',
         choices=((False, 'No'), (True, 'Yes')),
         widget=forms.RadioSelect
@@ -12,7 +12,7 @@ class StudentForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'department', 'has_taken_software_engineering_course', 'password']
+        fields = ['email', 'department', 'has_taken_software_course', 'password']
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
