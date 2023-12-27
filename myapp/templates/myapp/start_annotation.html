@@ -6,15 +6,19 @@
     <title>Start Annotation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:wght@300&family=Mulish:wght@300&family=Nunito+Sans:opsz@6..12&family=Oswald&family=PT+Sans&family=Playfair+Display&family=Poppins:wght@300&family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inria+Sans:wght@300&family=Mulish:wght@300&family=Nunito+Sans:opsz@6..12&family=Oswald&family=PT+Sans&family=Playfair+Display&family=Poppins:wght@300&family=Roboto+Condensed:wght@300&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/ann.css' %}"> <!-- Adjust the path as needed -->
 </head>
 
-<body style="font-family: 'Inria Sans', sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; background-color: #ddfffd; color: #2f2e2f; font-weight: 600; height: 100vh;">
+<body>
     <div class="container">
-        <h1 class="main-heading">Annotation</h1>
+        <div class="heading-container">
+            <h1>Annotation</h1>
+        </div>
         <div class="content">
-            <div class="guidelines" style="margin-bottom: 90px;">
+            <div class="guidelines">
                 <h2>Review Annotation Guidelines</h2>
                 <table>
                     <tr>
@@ -57,8 +61,11 @@
                         <td>Examples</td>
                         <td>
                             Reviews like advising or requesting to update any privacy-related feature of the app should
-                            be labeled as Privacy-Related Feature Request. <br>If a review reports personal data exposure
-                            due to a bug, label it as Privacy-Related Bug. <br>Reviews discussing both a feature request and a bug related to user privacy will be labeled as feature request+bug. <br> Reviews discussing the app's user interface
+                            be labeled as Privacy-Related Feature Request. <br>If a review reports personal data
+                            exposure
+                            due to a bug, label it as Privacy-Related Bug. <br>Reviews discussing both a feature request
+                            and a bug related to user privacy will be labeled as feature request+bug. <br> Reviews
+                            discussing the app's user interface
                             with no mention of privacy should be labeled as Not Privacy-Related.
                         </td>
                     </tr>
@@ -103,16 +110,19 @@
 
                     <input type="hidden" name="current_page" value="{{ page_obj.number }}">
 
-                    <div class="pagination">
+                    <div class="pagination button-container">
                         <!-- {% if page_obj.has_previous %}
                         <button type="submit" name="action" value="previous">Previous</button>
                         {% endif %} -->
                         {% if page_obj.has_next %}
-                        <button type="submit" name="action" value="next" style="background-color: #4c82af; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Next</button>
+                        <button type="submit" name="action" value="next" class="next-button">Next</button>
                         {% endif %}
                     </div>
 
-                    <button type="submit" name="action" value="save" style="position: absolute; bottom: 20pt; right: 257pt; background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Save</button>
+                    <!-- <div class="save-button-container">
+                        <button type="submit" name="action" value="save" class="save-button">Save</button>
+                    </div> -->
+
                 </form>
             </div>
             <script>

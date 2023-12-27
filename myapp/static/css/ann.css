@@ -1,55 +1,55 @@
 body {
-    font-family: 'Nunito Sans', sans-serif;
-    margin: 0;
-    padding: 0;
+    font-family: 'Inria Sans', sans-serif;
+    margin: 0; /* Set margins to 0 to prevent any unwanted space */
+    padding: 0; /* Set padding to 0 to prevent any unwanted space */
+    background-color: #ddfffd;
+    color: #2f2e2f;
+    font-weight: 600;
     display: flex;
+    flex-direction: column; /* Stack children vertically */
     justify-content: center;
     align-items: center;
-    background-color: #cbb2ff;
-    color: #5f089d;
-    font-weight: 600;
+  
 }
 
 .container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 20px;
+    width: auto; /* Take the width as per content */
+    max-width: 1200px; /* Max width of the container */
+    margin: 0 auto; /* Center the container */
+/* Padding inside the container */
+    box-sizing: border-box; /* Include padding in width calculations */
 }
-/* .container {
-    font-family: 'Nunito Sans', sans-serif;
-    width: 90%;
-    margin: auto;
-    max-width: 1200px;
-    text-align: center; 
-} */
 
 .main-heading {
-    margin-bottom: 20px; /* Spacing below the main heading */
+    margin: 20px 0; /* Spacing above and below the main heading */
 }
 
 .content {
     display: flex;
+    flex-wrap: wrap; /* Wrap onto the next line if not enough space */
     justify-content: space-between;
+    width: 100%; /* Full width */
 }
 
 .guidelines, .reviews {
-    flex-basis: 48%; /* Adjust the width as needed */
-    text-align: left; /* Align text to the left for sub sections */
+    flex: 1; /* Take equal space */
+    margin: 10px; /* Space around each section */
+    max-width: 48%; /* Maximum width */
 }
 
 .guidelines {
-    padding-right: 20px; /* Space between columns */
+    padding-right: 20px; /* Space between guidelines and reviews */
+    
 }
 
 .review {
     margin-bottom: 20px;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 2px solid #00a2ff; /* Add your desired border color here, for example, blue (#007bff) */
     border-radius: 5px;
-    background-color: rgb(32, 98, 76);
+    background-color: rgb(255, 255, 255);
 }
+
 
 .review p {
     font-size: 1.1em;
@@ -66,20 +66,13 @@ body {
     align-items: center;
     margin-bottom: 5px;
 }
-
+.heading-container {
+    text-align: center; /* Centers the heading horizontally */
+    margin-bottom: 8pt; /* Optional: Adds some space below the heading */
+    font-weight: bold;
+}
 input[type="radio"] {
     margin-right: 5px;
-}
-
-.submit-btn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 1em;
-    color: white;
-    background-color: rgb(73, 163, 228);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
 .guidelines table {
@@ -105,24 +98,57 @@ input[type="radio"] {
 }
 
 .pagination {
-    text-align: center;
     margin-top: 20px;
+    width: 100%; /* Full width */
 }
 
-.savebtn {
-    background-color: #4CAF50;
-    border: none;
+/* Style the "Save" button */
+.save-button {
+    background-color: #2ecc71;
     color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
     cursor: pointer;
-    border-radius: 5px;
+    margin-top: 20px; /* Add margin for spacing from other content */
 }
 
-.button:hover, .savebtn:hover {
-    background-color: #45a049;
+/* Style the container for the "Save" button */
+.save-button-container {
+    text-align: center; /* Center the content horizontally */
+    margin-top: 20px; /* Add space between the "Next" button and the "Save" button */
+}
+
+/* Style the "Save" button */
+.save-button {
+    background-color: #2ecc71;
+    color: white;
+    
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-button:hover {
+    background-color: #27ae60;
+}
+
+
+.button-container {
+    text-align: center;
+}
+
+/* Style the "Next" button */
+.next-button {
+    background-color: #62a6ff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px; /* Add margin for spacing between buttons */
+}
+
+.next-button:hover {
+    background-color: #4b99ff;
 }

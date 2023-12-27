@@ -23,11 +23,17 @@
 <body>
     <div class="container">
         <div class="left-content">
-            <h1>Become an Annotator</h1>
+            <div class="heading-container">
+                <h1>Become an Annotator</h1>
+            </div>
+            
             <form method="post">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit" class="button">Submit</button>
+                <div class="button-container">
+                    <button type="submit" class="button">Submit</button>
+                </div>
+                
             </form>
             {% if 'Student with this Email already exists. Please sign in.' in messages %}
             <p class="error-message">Student with this Email already exists. Please sign in.</p>
@@ -40,7 +46,7 @@
             {% endif %}
         </div>
         <div class="right-content">
-            <img src="{% static 'image/signup.png' %}" alt="Descriptive Alt Text">
+            <img src="{% static 'image/signup.png' %}" alt="Descriptive Alt Text" >
         </div>
     </div>
 </body>

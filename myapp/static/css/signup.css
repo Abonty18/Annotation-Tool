@@ -5,8 +5,8 @@ body {
      display: flex;
      justify-content: center;
      align-items: center;
-     background-color: #cbb2ff;
-     color: #5f089d;
+     background-color: #e1c3ff;
+     color: #1c1c1c;
      font-weight: 600;
  }
  
@@ -22,12 +22,13 @@ body {
      flex: 1;
  }
  
+ 
  .left-content {
      padding: 20px;
  }
  
  .right-content img {
-     width: 100%;
+     width: 90%;
      height: auto;
  }
  
@@ -39,7 +40,17 @@ body {
      border-radius: 4px;
      cursor: pointer;
  }
- 
+ .heading-container {
+    text-align: center; /* Centers the heading horizontally */
+    margin-bottom: 8pt; /* Optional: Adds some space below the heading */
+}
+
+ .button-container {
+    display: flex;
+    justify-content: center; /* Centers the button horizontally */
+    margin-top: 15px; /* Optional: Adds some space above the button */
+}
+
  .button:hover {
      background-color: #8034fc;
  }
@@ -47,15 +58,61 @@ body {
  .error-message {
      color: red;
  }
- 
+
  .form-errors {
      color: red;
  }
 
 
  form{
-     background-color: aliceblue;
-     padding: 10pt;
+     background-color: rgb(248, 244, 255);
+     padding: 20pt;
      border-radius: 10px;
  }
  
+ /* Input Field Styling */
+form input[type="text"],
+form input[type="password"],
+form input[type="email"],
+form select,
+form textarea {
+    width: 100%; /* Adjust as needed */
+    padding: 8px 10px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Label Styling */
+form label {
+    font-size: 16px; /* Adjust as needed */
+    color: #1c1c1c;
+    font-weight: bold;
+}
+
+/* Focus and Hover States */
+form input[type="text"]:focus,
+form input[type="password"]:focus,
+form input[type="email"]:focus,
+form select:focus,
+form textarea:focus {
+    border-color: #9e62ff;
+    outline: none;
+}
+
+form input[type="text"]:hover,
+form input[type="password"]:hover,
+form input[type="email"]:hover,
+form select:hover,
+form textarea:hover {
+    border-color: #8034fc;
+}
+
+/* Error Styling */
+.error-message,
+.form-errors {
+    font-size: 14px;
+    color: #ff0000; /* Adjust the color as needed */
+}
