@@ -80,13 +80,27 @@ def sign_out(request):
  logout(request)
  return redirect('index') 
 
+from django.core.paginator import Paginator
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from myapp.models import UnannotatedReview
+
 @login_required
 def start_annotation(request):
     user = request.user
     unannotated_reviews = get_prioritized_reviews_for_annotation(user)
 
     paginator = Paginator(unannotated_reviews, 1)
-    page_number = request.GET.get('page', 1)
+
+    # Check if a page number is stored in the session, otherwise default to 1
+    session_page_number = request.session.get('current_annotation_page', 1)
+    
+    # Get the page number from the request, or use the one from the session
+    page_number = request.GET.get('page', session_page_number)
+
+    # Update the session with the current page number
+    request.session['current_annotation_page'] = page_number
+
     page_obj = paginator.get_page(page_number)
 
     # Fetch the current review id
@@ -103,6 +117,7 @@ def start_annotation(request):
         'page_obj': page_obj,
         'selected_option': selected_option
     })
+
 
 
 
