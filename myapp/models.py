@@ -24,6 +24,7 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
+
     username = None
     email = models.EmailField(_('email address'), unique=True)
 
@@ -37,7 +38,10 @@ class CustomUser(AbstractUser):
     ]
     department = models.CharField(max_length=100, choices=DEPARTMENT_CHOICES)
 
-    has_taken_software_course = models.BooleanField(default=False)
+    # has_taken_software_course = models.BooleanField(default=False)
+    age = models.IntegerField(null=True, blank=True)
+    working_experience = models.IntegerField(default=0)  # years of experience
+    software_related_courses = models.JSONField(default=list)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

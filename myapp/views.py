@@ -248,10 +248,19 @@ def become_annotator(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             department = form.cleaned_data['department']
-            # No need to check if the email exists here, as it's already handled in the form's clean method
-            has_taken_course = form.cleaned_data['has_taken_software_course']
-            User = get_user_model() 
-            user = User.objects.create_user(email=email, password=password, department=department, has_taken_software_course=has_taken_course)
+            age = form.cleaned_data.get('age')  # Get optional age
+            working_experience = form.cleaned_data.get('working_experience')  # Get working experience
+            software_related_courses = form.cleaned_data.get('software_related_courses', [])  # Get selected courses
+
+            User = get_user_model()
+            user = User.objects.create_user(
+                email=email,
+                password=password,
+                department=department,
+                age=age,
+                working_experience=working_experience,
+                software_related_courses=software_related_courses
+            )
             user.save()
 
             login(request, user)
