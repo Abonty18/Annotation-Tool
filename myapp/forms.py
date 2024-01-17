@@ -20,8 +20,10 @@ class StudentForm(forms.ModelForm):
 
     # Software related courses (dynamic list can be defined elsewhere or fetched from a database)
     SOFTWARE_COURSES_CHOICES = [
-        ('course1', 'Course 1'),
-        ('course2', 'Course 2'),
+        ('Software Requirement and Specifications', 'Software Requirement and Specifications'),
+        ('Software Security', 'Software Security'),
+        ('Software Design and Architectures', 'Software Design and Architectures'),
+        ('Software Testing and Quality Assurance', 'Software Testing and Quality Assurance'),
         # ... more courses ...
     ]
     software_related_courses = forms.MultipleChoiceField(
