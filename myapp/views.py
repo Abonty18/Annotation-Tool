@@ -24,7 +24,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
-
+from .forms import AppReviewForm
 
 from django.db.models import Case, When, Value
 
@@ -367,8 +367,25 @@ def submit_test(request):
         return redirect('start_test')
 
     
+def review_classification(request):
+    # Here you might set up context data to pass to the template
+    context = {
+        # 'reviews': get_reviews_from_database_or_service(),
+    }
+    return render(request, 'myapp/review_page.html', context)
 
-    
+def app_review_form(request):
+    if request.method == "POST":
+        form = AppReviewForm(request.POST)
+        if form.is_valid():
+            # Here you would normally process the form data
+
+            # Redirect to the review classification page
+            return redirect('review_classification')  # Ensure you have a URL named 'review_classification'
+    else:
+        form = AppReviewForm()
+    return render(request, 'myapp/app_review_form.html', {'form': form})
+
 
 
 def test_results(request):

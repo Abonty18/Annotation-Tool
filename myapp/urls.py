@@ -16,7 +16,8 @@ urlpatterns = [
     path('start_annotation/', views.start_annotation, name='start_annotation'),
     path('enter-password/', views.enter_password, name='enter_password'),
     path('sign-out/', sign_out, name='sign_out'),
-
+    path('app-review/', views.app_review_form, name='app_review_form'),
+    path('review-classification/', views.review_classification, name='review_classification'),
 
     path('', views.index, name='index'),
     

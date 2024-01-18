@@ -15,7 +15,7 @@
         <div class="left-content">
             <h1>Welcome to the Annotation Tool</h1>
             <a href="{% url 'sign_in' %}?next={% url 'start_annotation' %}" class="start-button">Start Annotation</a>
-            <a href="" class="start-button">Create a Project</a>
+            <a href="{% url 'app_review_form' %}" class="start-button">Create a Project</a> <!-- Updated this line -->
         </div>
         <div class="right-content">
             <img src="{% static 'image/welcome.png' %}" alt="Annotation Tool Image">

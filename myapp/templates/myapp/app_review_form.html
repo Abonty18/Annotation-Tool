@@ -1,0 +1,30 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Create a Project</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&family=Nunito+Sans:opsz@6..12&family=Oswald&family=PT+Sans&family=Playfair+Display&family=Poppins:wght@300&family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="left-content">
+            <h1>Create Your Project</h1>
+            <form method="post" class="form-container">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="start-button">Generate Result</button>
+            </form>
+        </div>
+        <div class="right-content">
+            <img src="{% static 'image/privacy.svg' %}" alt="Annotation Tool Image">
+        </div>
+    </div>
+</body>
+
+</html>

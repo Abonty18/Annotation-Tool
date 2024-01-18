@@ -41,3 +41,18 @@ class StudentForm(forms.ModelForm):
         if CustomUser.objects.filter(email=email).exists():
             raise ValidationError("A user with that email already exists.")
         return email
+
+
+class AppReviewForm(forms.Form):
+    app_link = forms.URLField(label="App Link", required=True)
+    start_date = forms.DateField(label="Start Date", widget=forms.SelectDateWidget)
+    end_date = forms.DateField(label="End Date", widget=forms.SelectDateWidget)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date")
+        end_date = cleaned_data.get("end_date")
+
+        if end_date < start_date:
+            raise forms.ValidationError("End date should be after the start date.")
+        return cleaned_data

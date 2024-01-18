@@ -1,0 +1,207 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&family=Nunito+Sans:opsz@6..12&family=Oswald&family=PT+Sans&family=Playfair+Display&family=Poppins:wght@300&family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Classification</title>
+    <link rel="stylesheet" href="{% static 'css/review.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="section-header">
+            <h2>App Review Classification</h2>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Reviews</th>
+                    <th>Classification</th>
+                    <th>Agree/Disagree</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>"Good app. Really like it. But pleasee create features that hide followers and those who are following. Privacy setting is just not enough"</td>
+                    <td>Privacy Related Feature Request</td>
+                    <td class="agree-disagree">
+                        <input type="checkbox" id="agree1" name="review1" value="agree">
+                        <label for="agree1">Agree</label>
+                        <input type="checkbox" id="disagree1" name="review1" value="disagree">
+                        <label for="disagree1">Disagree</label>
+                    </td>
+                </tr>
+                <tr>
+                    <tr>
+                         <td>"I can't change my Instagram account password and this page doesn't work"</td>
+                         <td>Privacy Related Bug</td>
+                         <td class="agree-disagree">
+                             <input type="checkbox" id="agree1" name="review1" value="agree">
+                             <label for="agree1">Agree</label>
+                             <input type="checkbox" id="disagree1" name="review1" value="disagree">
+                             <label for="disagree1">Disagree</label>
+                         </td>
+                     </tr>
+                     <tr>
+                    <td>"Why does this game need access to my contacts?"</td>
+                    <td>Privacy Related Feature Request</td>
+                    <td class="agree-disagree">
+                        <input type="checkbox" id="agree2" name="review2" value="agree">
+                        <label for="agree2">Agree</label>
+                        <input type="checkbox" id="disagree2" name="review2" value="disagree">
+                        <label for="disagree2">Disagree</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>"I absolutely loved this app. Today I noticed that I can no longer access my account on neither the app nor laptop. And as you need to use the app to report a problem... Please fix this bug"</td>
+                    <td>Privacy Related Bug</td>
+                    <td class="agree-disagree">
+                        <input type="checkbox" id="agree3" name="review3" value="agree">
+                        <label for="agree3">Agree</label>
+                        <input type="checkbox" id="disagree3" name="review3" value="disagree">
+                        <label for="disagree3">Disagree</label>
+                    </td>
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr>
+                    <td>"Good app. Really like it. But pleasee create features that hide followers and those who are following. Privacy setting is just not enough"</td>
+                    <td>Privacy Related Feature Request</td>
+                    <td class="agree-disagree">
+                        <input type="checkbox" id="agree1" name="review1" value="agree">
+                        <label for="agree1">Agree</label>
+                        <input type="checkbox" id="disagree1" name="review1" value="disagree">
+                        <label for="disagree1">Disagree</label>
+                    </td>
+                </tr>
+                <tr>
+                    <tr>
+                         <td>"I can't change my Instagram account password and this page doesn't work"</td>
+                         <td>Privacy Related Bug</td>
+                         <td class="agree-disagree">
+                             <input type="checkbox" id="agree1" name="review1" value="agree">
+                             <label for="agree1">Agree</label>
+                             <input type="checkbox" id="disagree1" name="review1" value="disagree">
+                             <label for="disagree1">Disagree</label>
+                         </td>
+                     </tr>
+                     <tr>
+                    <td>"Why does this game need access to my contacts?"</td>
+                    <td>Privacy Related Feature Request</td>
+                    <td class="agree-disagree">
+                        <input type="checkbox" id="agree2" name="review2" value="agree">
+                        <label for="agree2">Agree</label>
+                        <input type="checkbox" id="disagree2" name="review2" value="disagree">
+                        <label for="disagree2">Disagree</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>"I absolutely loved this app. Today I noticed that I can no longer access my account on neither the app nor laptop. And as you need to use the app to report a problem... Please fix this bug"</td>
+                    <td>Privacy Related Bug</td>
+                    <td class="agree-disagree">
+                        <input type="checkbox" id="agree3" name="review3" value="agree">
+                        <label for="agree3">Agree</label>
+                        <input type="checkbox" id="disagree3" name="review3" value="disagree">
+                        <label for="disagree3">Disagree</label>
+                    </td>
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr>
+                    <td>"Good app. Really like it. But pleasee create features that hide followers and those who are following. Privacy setting is just not enough"</td>
+                    <td>Privacy Related Feature Request</td>
+                    <td class="agree-disagree">
+                        <input type="checkbox" id="agree1" name="review1" value="agree">
+                        <label for="agree1">Agree</label>
+                        <input type="checkbox" id="disagree1" name="review1" value="disagree">
+                        <label for="disagree1">Disagree</label>
+                    </td>
+                </tr>
+                <tr>
+                    <tr>
+                         <td>"I can't change my Instagram account password and this page doesn't work"</td>
+                         <td>Privacy Related Bug</td>
+                         <td class="agree-disagree">
+                             <input type="checkbox" id="agree1" name="review1" value="agree">
+                             <label for="agree1">Agree</label>
+                             <input type="checkbox" id="disagree1" name="review1" value="disagree">
+                             <label for="disagree1">Disagree</label>
+                         </td>
+                     </tr>
+                     <tr>
+                    <td>"Why does this game need access to my contacts?"</td>
+                    <td>Privacy Related Feature Request</td>
+                    <td class="agree-disagree">
+                        <input type="checkbox" id="agree2" name="review2" value="agree">
+                        <label for="agree2">Agree</label>
+                        <input type="checkbox" id="disagree2" name="review2" value="disagree">
+                        <label for="disagree2">Disagree</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>"I absolutely loved this app. Today I noticed that I can no longer access my account on neither the app nor laptop. And as you need to use the app to report a problem... Please fix this bug"</td>
+                    <td>Privacy Related Bug</td>
+                    <td class="agree-disagree">
+                        <input type="checkbox" id="agree3" name="review3" value="agree">
+                        <label for="agree3">Agree</label>
+                        <input type="checkbox" id="disagree3" name="review3" value="disagree">
+                        <label for="disagree3">Disagree</label>
+                    </td>
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr>
+                    <td>"Good app. Really like it. But pleasee create features that hide followers and those who are following. Privacy setting is just not enough"</td>
+                    <td>Privacy Related Feature Request</td>
+                    <td class="agree-disagree">
+                        <input type="checkbox" id="agree1" name="review1" value="agree">
+                        <label for="agree1">Agree</label>
+                        <input type="checkbox" id="disagree1" name="review1" value="disagree">
+                        <label for="disagree1">Disagree</label>
+                    </td>
+                </tr>
+                <tr>
+                    <tr>
+                         <td>"I can't change my Instagram account password and this page doesn't work"</td>
+                         <td>Privacy Related Bug</td>
+                         <td class="agree-disagree">
+                             <input type="checkbox" id="agree1" name="review1" value="agree">
+                             <label for="agree1">Agree</label>
+                             <input type="checkbox" id="disagree1" name="review1" value="disagree">
+                             <label for="disagree1">Disagree</label>
+                         </td>
+                     </tr>
+                     <tr>
+                    <td>"Why does this game need access to my contacts?"</td>
+                    <td>Privacy Related Feature Request</td>
+                    <td class="agree-disagree">
+                        <input type="checkbox" id="agree2" name="review2" value="agree">
+                        <label for="agree2">Agree</label>
+                        <input type="checkbox" id="disagree2" name="review2" value="disagree">
+                        <label for="disagree2">Disagree</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>"I absolutely loved this app. Today I noticed that I can no longer access my account on neither the app nor laptop. And as you need to use the app to report a problem... Please fix this bug"</td>
+                    <td>Privacy Related Bug</td>
+                    <td class="agree-disagree">
+                        <input type="checkbox" id="agree3" name="review3" value="agree">
+                        <label for="agree3">Agree</label>
+                        <input type="checkbox" id="disagree3" name="review3" value="disagree">
+                        <label for="disagree3">Disagree</label>
+                    </td>
+                </tr>
+                <!-- Additional review items... -->
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
