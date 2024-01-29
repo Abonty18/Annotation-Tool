@@ -6,20 +6,33 @@
 <head>
     <title>Landing Page</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&family=Nunito+Sans:opsz@6..12&family=Oswald&family=PT+Sans&family=Playfair+Display&family=Poppins:wght@300&family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&family=Nunito+Sans:opsz@6..12&family=Oswald&family=PT+Sans&family=Playfair+Display&family=Poppins:wght@300&family=Roboto+Condensed:wght@300&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
 </head>
+
 <body>
     <div class="container">
         <div class="left-content">
             <h1>Welcome to the Annotation Tool</h1>
-            <a href="{% url 'sign_in' %}?next={% url 'start_annotation' %}" class="start-button">Start Annotation</a>
-            <a href="{% url 'app_review_form' %}" class="start-button">Create a Project</a> <!-- Updated this line -->
+            <!-- Add this form in index.html -->
+            <form method="post" action="{% url 'check_email' %}" class="email-form">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    <button type="submit" class="start-button">Start Annotation</button>
+                </div>
+            </form>
+
+            <!-- <a href="{% url 'sign_in' %}?next={% url 'start_annotation' %}" class="start-button">Start Annotation</a> -->
+            <!-- <a href="{% url 'app_review_form' %}" class="start-button">Create a Project</a> Updated this line -->
         </div>
         <div class="right-content">
             <img src="{% static 'image/welcome.png' %}" alt="Annotation Tool Image">
         </div>
     </div>
 </body>
+
 </html>

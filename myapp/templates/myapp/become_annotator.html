@@ -15,8 +15,10 @@
 <head>
     <title>Become Annotator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&family=Nunito+Sans:opsz@6..12&family=Oswald&family=PT+Sans&family=Playfair+Display&family=Poppins:wght@300&family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&family=Nunito+Sans:opsz@6..12&family=Oswald&family=PT+Sans&family=Playfair+Display&family=Poppins:wght@300&family=Roboto+Condensed:wght@300&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/signup.css' %}">
 </head>
 
@@ -26,14 +28,22 @@
             <div class="heading-container">
                 <h1>Become an Annotator</h1>
             </div>
-            
+
             <form method="post">
                 {% csrf_token %}
-                {{ form.as_p }}
+                <!-- In your become_annotator.html template -->
+                {% if not show_email_field %}
+                <input type="hidden" name="email" value="{{ email }}">
+                {% endif %}
+
+                <p>{{ form.department.label_tag }} {{ form.department }}</p>
+                <p>{{ form.age.label_tag }} {{ form.age }}</p>
+                <p>{{ form.working_experience.label_tag }} {{ form.working_experience }}</p>
+                <p>{{ form.software_related_courses.label_tag }} {{ form.software_related_courses }}</p>
+                <p>{{ form.password.label_tag }} {{ form.password }}</p>
                 <div class="button-container">
                     <button type="submit" class="button">Submit</button>
                 </div>
-                
             </form>
             {% if 'Student with this Email already exists. Please sign in.' in messages %}
             <p class="error-message">Student with this Email already exists. Please sign in.</p>
@@ -46,8 +56,9 @@
             {% endif %}
         </div>
         <div class="right-content">
-            <img src="{% static 'image/signup.png' %}" alt="Descriptive Alt Text" >
+            <img src="{% static 'image/signup.png' %}" alt="Descriptive Alt Text">
         </div>
     </div>
 </body>
+
 </html>

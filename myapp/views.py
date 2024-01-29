@@ -25,10 +25,20 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
 from .forms import AppReviewForm
-
 from django.db.models import Case, When, Value
 
 
+def check_email(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if CustomUser.objects.filter(email=email).exists():
+            # Redirect to enter_password page with email in session
+            request.session['email_for_signin'] = email
+            return redirect('enter_password')
+        else:
+            # Redirect to signup page with email as query parameter
+            return redirect(f"{reverse('become_annotator')}?email={email}")
+    return redirect('index')
 
 def get_prioritized_reviews_for_annotation(user):
     # Fetch reviews that have less than 3 annotations and not annotated by the current user
@@ -238,43 +248,50 @@ def become_annotator(request):
     storage = messages.get_messages(request)
     storage.used = True
 
-    next_page = request.GET.get('next', 'start_test') 
+    next_page = request.GET.get('next', 'start_annotation') 
     email = request.GET.get('email', '')
-    form = StudentForm(initial={'email': email})
+    show_email_field = not bool(email)  # Show email field only if email is not provided
 
     if request.method == 'POST':
         form = StudentForm(request.POST)
+        if not show_email_field:
+            # Manually set the email data if the field is hidden
+            form.data = form.data.copy()
+            form.data['email'] = email
+        
         if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            department = form.cleaned_data['department']
-            age = form.cleaned_data.get('age')  # Get optional age
-            working_experience = form.cleaned_data.get('working_experience')  # Get working experience
-            software_related_courses = form.cleaned_data.get('software_related_courses', [])  # Get selected courses
-
+            # Create the user
             User = get_user_model()
             user = User.objects.create_user(
-                email=email,
-                password=password,
-                department=department,
-                age=age,
-                working_experience=working_experience,
-                software_related_courses=software_related_courses
+                email=form.cleaned_data.get('email', email),
+                password=form.cleaned_data['password'],
+                department=form.cleaned_data['department'],
+                age=form.cleaned_data.get('age'),  # Get optional age
+                working_experience=form.cleaned_data.get('working_experience'),  # Get working experience
+                software_related_courses=form.cleaned_data.get('software_related_courses', [])  # Get selected courses
             )
             user.save()
 
+            # Log the user in and redirect to the next page
             login(request, user)
-            return redirect('start_annotation')
+            return redirect(next_page)
         else:
-            # Handle form errors
+            # If the form is invalid and the email field is not shown, add it back as a hidden field
+            if not show_email_field:
+                form.initial['email'] = email
             for field in form.errors:
                 form[field].field.widget.attrs['class'] = 'error'
-            # Log the errors for debugging
-            print(form.errors)
     else:
-        form = StudentForm()
+        # Display the form for a GET request
+        
+        form = StudentForm(initial={'email': email}, show_email_field=show_email_field)
 
-    return render(request, 'myapp/become_annotator.html', {'form': form, 'next': 'start_annotation'})
+    return render(request, 'myapp/become_annotator.html', {
+        'form': form,
+        'show_email_field': show_email_field,
+        'email': email,  # Add this line
+        # ... other context variables ...
+    })
 
 
 def index(request):
@@ -315,11 +332,28 @@ def sign_in(request):
     return render(request, 'myapp/sign_in.html')
 
 
-def enter_password(request):
-    if request.method == 'POST':
-        email = request.session.get('email_for_signin')
-        password = request.POST.get('password')
+# def enter_password(request):
+#     if request.method == 'POST':
+#         email = request.session.get('email_for_signin')
+#         password = request.POST.get('password')
 
+#         user = authenticate(request, username=email, password=password)
+#         if user is not None:
+#             login(request, user)
+#             return redirect('start_annotation')
+#         else:
+#             messages.error(request, 'Invalid password. Please try again.')
+
+#     return render(request, 'myapp/enter_password.html')
+# Modify this in your views.py
+
+def enter_password(request):
+    email = request.session.get('email_for_signin')
+    if not email:
+        return redirect('index')  # Redirect to index if no email in session
+
+    if request.method == 'POST':
+        password = request.POST.get('password')
         user = authenticate(request, username=email, password=password)
         if user is not None:
             login(request, user)
@@ -327,7 +361,8 @@ def enter_password(request):
         else:
             messages.error(request, 'Invalid password. Please try again.')
 
-    return render(request, 'myapp/enter_password.html')
+    return render(request, 'myapp/enter_password.html', {'email': email})
+
 
 
 def submit_test(request):

@@ -7,7 +7,7 @@ class StudentForm(forms.ModelForm):
     age = forms.IntegerField(required=False)
 
     WORKING_EXPERIENCE_CHOICES = [
-        (0, '0 years'),
+        (0, '0-1 years'),
         (1, '1-2 years'),
         (3, '3-5 years'),
         (5, '5 years+'),
@@ -41,6 +41,11 @@ class StudentForm(forms.ModelForm):
         if CustomUser.objects.filter(email=email).exists():
             raise ValidationError("A user with that email already exists.")
         return email
+    def __init__(self, *args, **kwargs):
+        show_email_field = kwargs.pop('show_email_field', True)
+        super(StudentForm, self).__init__(*args, **kwargs)
+        if not show_email_field:
+            del self.fields['email']
 
 
 class AppReviewForm(forms.Form):

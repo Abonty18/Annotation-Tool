@@ -18,7 +18,7 @@ urlpatterns = [
     path('sign-out/', sign_out, name='sign_out'),
     path('app-review/', views.app_review_form, name='app_review_form'),
     path('review-classification/', views.review_classification, name='review_classification'),
-
+    path('check-email/', views.check_email, name='check_email'),
     path('', views.index, name='index'),
     
     # Other paths as needed...
