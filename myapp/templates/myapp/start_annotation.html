@@ -111,6 +111,7 @@
                     <input type="hidden" name="current_page" value="{{ page_obj.number }}">
 
                     <div class="pagination button-container">
+                        <a href="{% url 'index' %}" class="exit-button">Exit</a>
                         <!-- {% if page_obj.has_previous %}
                         <button type="submit" name="action" value="previous">Previous</button>
                         {% endif %} -->

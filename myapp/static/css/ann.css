@@ -161,3 +161,19 @@ input[type="radio"] {
 .next-button:hover {
     background-color: #4b99ff;
 }
+/* In ann.css or your CSS file */
+.exit-button {
+    display: inline-block;
+    padding: 10px 15px; /* Adjust padding as needed for your design */
+    background-color: #e8502a; /* Button background color */
+    color: #fff; /* Button text color */
+    text-decoration: none; /* Remove underline from the link */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Add rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Add a smooth hover effect */
+}
+
+.exit-button:hover {
+    background-color: #c04324; /* Button background color on hover */
+}
