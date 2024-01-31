@@ -80,6 +80,10 @@
                 </table>
             </div>
             <div class="reviews">
+                <div id="annotation-count-container">
+                    <span>Annotation Count: {{ annotation_count }}</span>
+                </div>
+                
                 <p>{{ review.content }}</p>
                 <h2>Reviews</h2>
                 <form method="post" action="{% url 'handle_annotation_submission' %}">
@@ -105,26 +109,22 @@
                     </div>
                     {% endfor %}
 
-
-                    <!-- Close the loop for page_obj here -->
-
                     <input type="hidden" name="current_page" value="{{ page_obj.number }}">
 
                     <div class="pagination button-container">
-                        <a href="{% url 'index' %}" class="exit-button">Exit</a>
-                        <!-- {% if page_obj.has_previous %}
-                        <button type="submit" name="action" value="previous">Previous</button>
-                        {% endif %} -->
+
                         {% if page_obj.has_next %}
                         <button type="submit" name="action" value="next" class="next-button">Next</button>
                         {% endif %}
                     </div>
 
-                    <!-- <div class="save-button-container">
-                        <button type="submit" name="action" value="save" class="save-button">Save</button>
-                    </div> -->
 
                 </form>
+
+<div class="exit-button-container">
+    <a href="{% url 'index' %}" class="exit-button">Save & Exit</a>
+</div>
+
             </div>
             <script>
                 document.addEventListener('DOMContentLoaded', function () {

@@ -26,6 +26,11 @@ from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
 from .forms import AppReviewForm
 from django.db.models import Case, When, Value
+from django.core.paginator import Paginator
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from myapp.models import UnannotatedReview
+from .models import Annotation
 
 
 def check_email(request):
@@ -89,47 +94,41 @@ def load_reviews():
 def sign_out(request):
  logout(request)
  return redirect('index') 
+def get_user_annotation_count(user):
+    return StudentAnnotation.objects.filter(
+        Q(student1=user) | Q(student2=user) | Q(student3=user)
+    ).distinct().count()
 
-from django.core.paginator import Paginator
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from myapp.models import UnannotatedReview
+
+
 
 @login_required
 def start_annotation(request):
     user = request.user
     unannotated_reviews = get_prioritized_reviews_for_annotation(user)
-
     paginator = Paginator(unannotated_reviews, 1)
-
-    # Check if a page number is stored in the session, otherwise default to 1
-    session_page_number = request.session.get('current_annotation_page', 1)
-    
+    annotation_count = get_user_annotation_count(user)  # Get the count of annotations
+    print(f"Annotation count for user {user.email}: {annotation_count}")  # Debugging statement
+    session_page_number = request.session.get('current_annotation_page', 1) 
     # Get the page number from the request, or use the one from the session
     page_number = request.GET.get('page', session_page_number)
-
     # Update the session with the current page number
     request.session['current_annotation_page'] = page_number
-
     page_obj = paginator.get_page(page_number)
-
     # Fetch the current review id
     current_review_id = None
     if page_obj.object_list:
         current_review = page_obj.object_list[0]
         current_review_id = current_review.id
-
     # Retrieve the selections from the session
     selections = request.session.get('selections', {})
     selected_option = selections.get(str(current_review_id))  # Ensure this is a string key
 
     return render(request, 'myapp/start_annotation.html', {
         'page_obj': page_obj,
-        'selected_option': selected_option
+        'selected_option': selected_option,
+        'annotation_count': annotation_count,  # Add this line to pass the count to the template
     })
-
-
-
 
 
 @login_required
@@ -224,10 +223,6 @@ def handle_annotation_submission(request):
         return redirect('start_annotation')
 
 
-
-
-
-
 def handle_pagination(request, action):
     # Get the current page number from the session or default to 1
     current_page = request.session.get('current_page', 1)
@@ -311,8 +306,6 @@ def start_test(request):
 
     return render(request, 'myapp/annotation_test.html', {'reviews': random_reviews})
 
-
-
 def create_project(request):
     return render(request, 'create_project.html')
 
@@ -332,20 +325,6 @@ def sign_in(request):
     return render(request, 'myapp/sign_in.html')
 
 
-# def enter_password(request):
-#     if request.method == 'POST':
-#         email = request.session.get('email_for_signin')
-#         password = request.POST.get('password')
-
-#         user = authenticate(request, username=email, password=password)
-#         if user is not None:
-#             login(request, user)
-#             return redirect('start_annotation')
-#         else:
-#             messages.error(request, 'Invalid password. Please try again.')
-
-#     return render(request, 'myapp/enter_password.html')
-# Modify this in your views.py
 
 def enter_password(request):
     email = request.session.get('email_for_signin')
