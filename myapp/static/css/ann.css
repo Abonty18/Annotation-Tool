@@ -168,7 +168,7 @@ input[type="radio"] {
 }
 
 .exit-button {
-    display: inline-block;
+
     padding: 10px 15px; /* Adjust padding as needed for your design */
     background-color: #1bb957; /* Button background color */
     color: #fff; /* Button text color */
