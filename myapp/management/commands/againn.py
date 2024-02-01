@@ -6,19 +6,25 @@ class Command(BaseCommand):
     help = 'Import reviews from an Excel file into UnannotatedReview model'
 
     def handle(self, *args, **kwargs):
-        excel_file_path = '11.8k.xlsx'  # Update with the path to your Excel file
+        excel_file_path = '21k.xlsx'  # Update with the path to your Excel file
         imported_count = 0  # Counter for imported reviews
 
         try:
-            # Read the Excel file
+            # Read the entire Excel file
             df = pd.read_excel(excel_file_path)
+
+            # Create a list to store UnannotatedReview objects
+            reviews_to_import = []
 
             # Iterate through the DataFrame and create UnannotatedReview objects
             for index, row in df.iterrows():
                 review_content = row.iloc[0]  # Corrected to use .iloc[0]
-                UnannotatedReview.objects.create(content=review_content)
+                reviews_to_import.append(UnannotatedReview(content=review_content))
                 imported_count += 1
 
-            self.stdout.write(self.style.SUCCESS(f'Successfully importeddd {imported_count} reviews from Excel'))
+            # Bulk insert all UnannotatedReview objects at once
+            UnannotatedReview.objects.bulk_create(reviews_to_import)
+
+            self.stdout.write(self.style.SUCCESS(f'Successfully imported {imported_count} reviews from Excel'))
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'Error occurred: {e}'))
