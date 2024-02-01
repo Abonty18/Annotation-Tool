@@ -6,7 +6,7 @@ class Command(BaseCommand):
     help = 'Import reviews from an Excel file into UnannotatedReview model'
 
     def handle(self, *args, **kwargs):
-        excel_file_path = 'tiktok.xlsx'  # Ensure this path is correct
+        excel_file_path = 'groundtruth.xlsx'  # Ensure this path is correct
         imported_count = 0
 
         try:

@@ -27,7 +27,7 @@ class CustomUser(AbstractUser):
 
     username = None
     email = models.EmailField(_('email address'), unique=True)
-
+    annotation_count = models.IntegerField(default=0)
     # New fields
     DEPARTMENT_CHOICES = [
         ('cse', 'CSE'),
