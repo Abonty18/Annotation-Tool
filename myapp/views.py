@@ -138,12 +138,15 @@ def handle_annotation_submission(request):
         action = request.POST.get('action')
         current_page = int(request.POST.get('current_page', 1))
         selections = request.session.get('selections', {})
+
         if action == 'save':
             # Logic to save and exit
             current_page = request.POST.get('current_page', 1)
             StudentProject.objects.filter(student=student).update(last_page=current_page)
             messages.success(request, "Your progress has been saved.")
-            return redirect('sign_out')  # Redirect to the sign-out page
+            return redirect('sign_out')
+
+        annotation_made = False  # Flag to check if a new annotation is made
 
         # Logic to handle annotations and navigation
         for key, value in request.POST.items():
@@ -153,7 +156,6 @@ def handle_annotation_submission(request):
                 selections[review_id] = annotation_value
                 review = get_object_or_404(UnannotatedReview, id=review_id)
 
-                # Check if the student has already annotated this review
                 existing_annotation = StudentAnnotation.objects.filter(
                     review=review,
                     student1=student
@@ -170,33 +172,33 @@ def handle_annotation_submission(request):
                     continue
 
                 # Check for an existing annotation object to update
-                annotation = StudentAnnotation.objects.filter(review=review).first()
-
-                if not annotation:
-                    # Create a new annotation if none exist for this review
-                    annotation = StudentAnnotation.objects.create(review=review, student1=student, student1annotation=annotation_value)
+                annotation, created = StudentAnnotation.objects.get_or_create(review=review, defaults={'student1': student, 'student1annotation': annotation_value})
+                if created:
+                    annotation_made = True  # New annotation was made
                 else:
-                    # Update an existing annotation with a new student if slots are available
+                    # Check available slots and update accordingly
                     if not annotation.student1:
                         annotation.student1 = student
                         annotation.student1annotation = annotation_value
+                        annotation_made = True
                     elif not annotation.student2:
                         annotation.student2 = student
                         annotation.student2annotation = annotation_value
+                        annotation_made = True
                     elif not annotation.student3:
                         annotation.student3 = student
                         annotation.student3annotation = annotation_value
-                    else:
-                        # messages.error(request, f"Review {review_id} already has 3 annotations by different students.")
-                        continue
+                        annotation_made = True
 
                 annotation.save()
-
-                # Update annotation count in the UnannotatedReview model
                 review.annotation_count = StudentAnnotation.objects.filter(review=review).count()
                 review.save()
 
-                # messages.success(request, f"Annotation for review {review_id} saved successfully.")
+        if annotation_made:
+            # Increment user's annotation count if a new annotation was made
+            student.annotation_count += 1
+            student.save()
+
         request.session['selections'] = selections
 
         # Handling navigation
