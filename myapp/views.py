@@ -1,5 +1,5 @@
 import logging
-from django.db.models import Q
+from django.db.models import F, Q
 import sys
 from django.db import transaction
 from django.shortcuts import render, redirect, reverse
@@ -60,21 +60,49 @@ def check_email(request):
 #         num_annotations__lt=3
 #     ).order_by('-num_annotations')
 
+# def get_prioritized_reviews_for_annotation(user):
+#     # Fetch reviews that have less than 3 annotations, not annotated by the current user, and have an annotation_count less than 3
+#     return UnannotatedReview.objects.annotate(
+#         num_annotations=Count('studentannotation')
+#     ).exclude(
+#         studentannotation__student1=user
+#     ).exclude(
+#         studentannotation__student2=user
+#     ).exclude(
+#         studentannotation__student3=user
+#     ).filter(
+#         num_annotations__lt=3,
+#         annotation_count__lt=3  # Exclude reviews with an annotation_count of 3
+#     ).order_by('-num_annotations')
+
+# def get_prioritized_reviews_for_annotation(user):
+#     # Fetch reviews that have less than 3 annotations, not annotated by the current user
+#     return UnannotatedReview.objects.annotate(
+#         num_annotations=Count('studentannotation')
+#     ).exclude(
+#         studentannotation__in=StudentAnnotation.objects.filter(
+#             Q(student1=user) | Q(student2=user) | Q(student3=user)
+#         )
+#     ).filter(
+#         annotation_count__lt=3  # Ensure reviews with 3 annotations are excluded
+#     ).order_by('-num_annotations')
+
+
+
+
 def get_prioritized_reviews_for_annotation(user):
-    # Fetch reviews that have less than 3 annotations, not annotated by the current user, and have not reached an annotation count of 3
+    # Fetch reviews that have less than 3 annotations and not annotated by the current user
     return UnannotatedReview.objects.annotate(
-        num_annotations=Count('studentannotation')
+        num_annotations=Count('studentannotation', distinct=True)
     ).exclude(
-        studentannotation__student1=user
-    ).exclude(
-        studentannotation__student2=user
-    ).exclude(
-        studentannotation__student3=user
+        studentannotation__in=StudentAnnotation.objects.filter(
+            Q(student1=user) | Q(student2=user) | Q(student3=user)
+        )
     ).filter(
-        num_annotations__lt=3
-    ).exclude(
-        num_annotations=3
-    ).order_by('-num_annotations')
+        annotation_count__lt=3
+    ).order_by('num_annotations')
+
+
 
 
 def get_reviews_for_annotation():
@@ -93,6 +121,23 @@ def get_labels_for_review(review_id):
     if annotations.count() == 3:
         return [annotation.label for annotation in annotations]
     return None
+
+
+
+def update_annotation_count(review_id):
+    # Correctly fetch the review instance
+    review = UnannotatedReview.objects.get(id=review_id)
+    # Update the annotation count based on related StudentAnnotations
+    review.annotation_count = StudentAnnotation.objects.filter(review=review).count()
+    review.save()
+
+    # Update the individual student's annotation count
+    for student in [review.student1, review.student2, review.student3]:
+        if student:
+            student.annotation_count = StudentAnnotation.objects.filter(
+                Q(student1=student) | Q(student2=student) | Q(student3=student)
+            ).distinct().count()
+            student.save()
 
 def load_reviews():
     file_path = os.path.join(settings.BASE_DIR, 'myapp', 'reviews.json')
@@ -121,7 +166,9 @@ def get_user_annotation_count(user):
 @login_required
 def start_annotation(request):
     user = request.user
-    unannotated_reviews = get_prioritized_reviews_for_annotation(user)
+    # Exclude reviews that already have 3 annotations
+    unannotated_reviews = get_prioritized_reviews_for_annotation(user).exclude(annotation_count=3)
+    
     paginator = Paginator(unannotated_reviews, 1)
     annotation_count = get_user_annotation_count(user)  # Get the count of annotations
     print(f"Annotation count for user {user.email}: {annotation_count}")  # Debugging statement
@@ -146,16 +193,80 @@ def start_annotation(request):
         'annotation_count': annotation_count,  # Add this line to pass the count to the template
     })
 
+# @login_required
+# def handle_annotation_submission(request):
+#     if request.method == 'POST':
+#         student = request.user
+#         action = request.POST.get('action')
+#         current_page = int(request.POST.get('current_page', 1))
+#         selections = request.session.get('selections', {})
+
+#         if action == 'save':
+#             StudentProject.objects.filter(student=student).update(last_page=current_page)
+#             messages.success(request, "Your progress has been saved.")
+#             return redirect('sign_out')
+
+#         # Logic to handle annotations
+#         for key, value in request.POST.items():
+#             if key.startswith('annotation_'):
+#                 review_id = int(key.split('_')[1])
+#                 annotation_value = int(value)
+#                 review = get_object_or_404(UnannotatedReview, id=review_id)
+
+#                 # Attempt to get or create the annotation in a way that avoids duplicates
+#                 with transaction.atomic():
+#                     annotations = StudentAnnotation.objects.filter(review=review)
+#                     existing_annotation = annotations.exclude(
+#                         Q(student1=student) | Q(student2=student) | Q(student3=student)
+#                     ).first()
+
+#                     if existing_annotation:
+#                         # Assign the current user and their annotation to the first available slot
+#                         if not existing_annotation.student1:
+#                             existing_annotation.student1 = student
+#                             existing_annotation.student1annotation = annotation_value
+#                         elif not existing_annotation.student2:
+#                             existing_annotation.student2 = student
+#                             existing_annotation.student2annotation = annotation_value
+#                         elif not existing_annotation.student3:
+#                             existing_annotation.student3 = student
+#                             existing_annotation.student3annotation = annotation_value
+#                         existing_annotation.save()
+#                     else:
+#                         # Create a new annotation
+#                         StudentAnnotation.objects.create(review=review, student1=student, student1annotation=annotation_value)
+
+#                 review.save()
+#                 update_annotation_count(review.id)
+
+#         request.session['selections'] = selections
+
+#         # Handling navigation
+#         if action in ['next', 'previous']:
+#             if action == 'next':
+#                 current_page += 1
+#             elif action == 'previous' and current_page > 1:
+#                 current_page -= 1
+#             request.session['last_page'] = current_page
+
+#             return redirect(f"{reverse('start_annotation')}?page={current_page}")
+
+#         return redirect('start_annotation')
+#     else:
+#         messages.error(request, "You must submit the form with the POST method.")
+#         return redirect('start_annotation')
+    
+
 @login_required
 def handle_annotation_submission(request):
     if request.method == 'POST':
-        student = request.user
+        user = request.user  # The authenticated user
         action = request.POST.get('action')
         current_page = int(request.POST.get('current_page', 1))
         selections = request.session.get('selections', {})
 
         if action == 'save':
-            StudentProject.objects.filter(student=student).update(last_page=current_page)
+            StudentProject.objects.filter(student=user).update(last_page=current_page)
             messages.success(request, "Your progress has been saved.")
             return redirect('sign_out')
 
@@ -164,32 +275,49 @@ def handle_annotation_submission(request):
             if key.startswith('annotation_'):
                 review_id = int(key.split('_')[1])
                 annotation_value = int(value)
-                review = get_object_or_404(UnannotatedReview, id=review_id)
 
-                # Attempt to get or create the annotation in a way that avoids duplicates
+                # First, check if the user has already annotated this review
+                already_annotated = StudentAnnotation.objects.filter(
+                    Q(student1=user) | Q(student2=user) | Q(student3=user),
+                    review_id=review_id
+                ).exists()
+
+                if already_annotated:
+                    messages.error(request, "You have already annotated this review.")
+                    continue  # Skip the rest of the current loop iteration
+
+                try:
+                    review = UnannotatedReview.objects.get(id=review_id, annotation_count__lt=3)
+                except UnannotatedReview.DoesNotExist:
+                    messages.error(request, "This review is either fully annotated or does not exist.")
+                    continue  # Skip the rest of the current loop iteration
+
+                # Assign annotation to the first available slot
                 with transaction.atomic():
-                    annotations = StudentAnnotation.objects.filter(review=review)
-                    existing_annotation = annotations.exclude(
-                        Q(student1=student) | Q(student2=student) | Q(student3=student)
-                    ).first()
+                    annotation, created = StudentAnnotation.objects.get_or_create(
+                        review=review,
+                        defaults={
+                            'student1': user,
+                            'student1annotation': annotation_value
+                        }
+                    )
+                    
+                    if not created:
+                        if annotation.student2 is None:
+                            annotation.student2 = user
+                            annotation.student2annotation = annotation_value
+                        elif annotation.student3 is None:
+                            annotation.student3 = user
+                            annotation.student3annotation = annotation_value
+                        else:
+                            messages.error(request, "No available slots for annotation.")
+                            continue  # This should not happen as we check annotation_count before
 
-                    if existing_annotation:
-                        # Assign the current user and their annotation to the first available slot
-                        if not existing_annotation.student1:
-                            existing_annotation.student1 = student
-                            existing_annotation.student1annotation = annotation_value
-                        elif not existing_annotation.student2:
-                            existing_annotation.student2 = student
-                            existing_annotation.student2annotation = annotation_value
-                        elif not existing_annotation.student3:
-                            existing_annotation.student3 = student
-                            existing_annotation.student3annotation = annotation_value
-                        existing_annotation.save()
-                    else:
-                        # Create a new annotation
-                        StudentAnnotation.objects.create(review=review, student1=student, student1annotation=annotation_value)
+                        annotation.save()
 
-                review.save()
+                    # Update review's annotation count
+                    review.annotation_count = F('annotation_count') + 1
+                    review.save()
 
         request.session['selections'] = selections
 
@@ -207,6 +335,33 @@ def handle_annotation_submission(request):
     else:
         messages.error(request, "You must submit the form with the POST method.")
         return redirect('start_annotation')
+    
+def update_annotation_count(review):
+    # Retrieve the current annotations for this review atomically to avoid race conditions
+    with transaction.atomic():
+        current_count = StudentAnnotation.objects.filter(review=review).count()
+        review.annotation_count = current_count
+        review.save()
+
+
+def create_annotation(user, review_id):
+    # Ensure you're handling duplicates and concurrency issues as per your application's requirements
+    with transaction.atomic():
+        review = get_object_or_404(UnannotatedReview, id=review_id)
+        annotation, created = StudentAnnotation.objects.get_or_create(
+            review=review,
+            student1=user  # Adjust according to your logic for assigning students
+        )
+        if created:
+            # If a new annotation is created, update the annotation count for the review
+            update_annotation_count(review_id)
+
+
+def delete_annotation(user, review):
+    # Delete the user's annotation for the review
+    StudentAnnotation.objects.filter(review=review, student1=user).delete()
+    # Update the annotation_count for the review
+    update_annotation_count(review.id)
 
 def handle_pagination(request, action):
     # Get the current page number from the session or default to 1

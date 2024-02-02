@@ -76,7 +76,12 @@ class StudentAnnotation(models.Model):
     student3annotation = models.IntegerField(null=True, blank=True)
 
     class Meta:
-        unique_together = [('review', 'student1'), ('review', 'student2'), ('review', 'student3')]
+     unique_together = [
+        ('review', 'student1'),
+        ('review', 'student2'),
+        ('review', 'student3')
+    ]
+
 
 
 
@@ -93,8 +98,8 @@ class Annotation(models.Model):
     value = models.IntegerField(null=True, blank=True)  # Stores the annotation value
     label = models.CharField(max_length=100, null=True, blank=True)
 
-    class Meta:
-        unique_together = ('review', 'student')
+    # class Meta:
+    #     unique_together = ('review', 'student')
 
 
 
