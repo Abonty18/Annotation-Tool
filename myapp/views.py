@@ -46,8 +46,22 @@ def check_email(request):
             return redirect(f"{reverse('become_annotator')}?email={email}")
     return redirect('index')
 
+# def get_prioritized_reviews_for_annotation(user):
+#     # Fetch reviews that have less than 3 annotations and not annotated by the current user
+#     return UnannotatedReview.objects.annotate(
+#         num_annotations=Count('studentannotation')
+#     ).exclude(
+#         studentannotation__student1=user
+#     ).exclude(
+#         studentannotation__student2=user
+#     ).exclude(
+#         studentannotation__student3=user
+#     ).filter(
+#         num_annotations__lt=3
+#     ).order_by('-num_annotations')
+
 def get_prioritized_reviews_for_annotation(user):
-    # Fetch reviews that have less than 3 annotations and not annotated by the current user
+    # Fetch reviews that have less than 3 annotations, not annotated by the current user, and have not reached an annotation count of 3
     return UnannotatedReview.objects.annotate(
         num_annotations=Count('studentannotation')
     ).exclude(
@@ -58,8 +72,9 @@ def get_prioritized_reviews_for_annotation(user):
         studentannotation__student3=user
     ).filter(
         num_annotations__lt=3
+    ).exclude(
+        num_annotations=3
     ).order_by('-num_annotations')
-
 
 
 def get_reviews_for_annotation():
