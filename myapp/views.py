@@ -194,10 +194,10 @@ def handle_annotation_submission(request):
                 review.annotation_count = StudentAnnotation.objects.filter(review=review).count()
                 review.save()
 
-        if annotation_made:
-            # Increment user's annotation count if a new annotation was made
-            student.annotation_count += 1
-            student.save()
+        # if annotation_made:
+        #     # Increment user's annotation count if a new annotation was made
+        #     student.annotation_count += 1
+        #     student.save()
 
         request.session['selections'] = selections
 
