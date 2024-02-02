@@ -1,6 +1,7 @@
 import logging
 from django.db.models import Q
 import sys
+from django.db import transaction
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 from .forms import StudentForm
@@ -130,7 +131,6 @@ def start_annotation(request):
         'annotation_count': annotation_count,  # Add this line to pass the count to the template
     })
 
-
 @login_required
 def handle_annotation_submission(request):
     if request.method == 'POST':
@@ -140,82 +140,51 @@ def handle_annotation_submission(request):
         selections = request.session.get('selections', {})
 
         if action == 'save':
-            # Logic to save and exit
-            current_page = request.POST.get('current_page', 1)
             StudentProject.objects.filter(student=student).update(last_page=current_page)
             messages.success(request, "Your progress has been saved.")
             return redirect('sign_out')
 
-        annotation_made = False  # Flag to check if a new annotation is made
-
-        # Logic to handle annotations and navigation
+        # Logic to handle annotations
         for key, value in request.POST.items():
             if key.startswith('annotation_'):
                 review_id = int(key.split('_')[1])
-                annotation_value = value
-                selections[review_id] = annotation_value
+                annotation_value = int(value)
                 review = get_object_or_404(UnannotatedReview, id=review_id)
 
-                existing_annotation = StudentAnnotation.objects.filter(
-                    review=review,
-                    student1=student
-                ) | StudentAnnotation.objects.filter(
-                    review=review,
-                    student2=student
-                ) | StudentAnnotation.objects.filter(
-                    review=review,
-                    student3=student
-                )
+                # Attempt to get or create the annotation in a way that avoids duplicates
+                with transaction.atomic():
+                    annotations = StudentAnnotation.objects.filter(review=review)
+                    existing_annotation = annotations.exclude(
+                        Q(student1=student) | Q(student2=student) | Q(student3=student)
+                    ).first()
 
-                if existing_annotation.exists():
-                    messages.error(request, f"You have already annotated review {review_id}.")
-                    continue
+                    if existing_annotation:
+                        # Assign the current user and their annotation to the first available slot
+                        if not existing_annotation.student1:
+                            existing_annotation.student1 = student
+                            existing_annotation.student1annotation = annotation_value
+                        elif not existing_annotation.student2:
+                            existing_annotation.student2 = student
+                            existing_annotation.student2annotation = annotation_value
+                        elif not existing_annotation.student3:
+                            existing_annotation.student3 = student
+                            existing_annotation.student3annotation = annotation_value
+                        existing_annotation.save()
+                    else:
+                        # Create a new annotation
+                        StudentAnnotation.objects.create(review=review, student1=student, student1annotation=annotation_value)
 
-                # Check for an existing annotation object to update
-                annotation, created = StudentAnnotation.objects.get_or_create(review=review, defaults={'student1': student, 'student1annotation': annotation_value})
-                if created:
-                    annotation_made = True  # New annotation was made
-                else:
-                    # Check available slots and update accordingly
-                    if not annotation.student1:
-                        annotation.student1 = student
-                        annotation.student1annotation = annotation_value
-                        annotation_made = True
-                    elif not annotation.student2:
-                        annotation.student2 = student
-                        annotation.student2annotation = annotation_value
-                        annotation_made = True
-                    elif not annotation.student3:
-                        annotation.student3 = student
-                        annotation.student3annotation = annotation_value
-                        annotation_made = True
-
-                annotation.save()
-                review.annotation_count = StudentAnnotation.objects.filter(review=review).count()
                 review.save()
-
-        # if annotation_made:
-        #     # Increment user's annotation count if a new annotation was made
-        #     student.annotation_count += 1
-        #     student.save()
 
         request.session['selections'] = selections
 
         # Handling navigation
         if action in ['next', 'previous']:
-            current_page = int(request.POST.get('current_page', 1))
             if action == 'next':
-            # Store the selection for the current page
-              for key, value in request.POST.items():
-                if key.startswith('annotation_'):
-                    selections[current_page] = (key, value)
-              current_page += 1
+                current_page += 1
             elif action == 'previous' and current_page > 1:
-              current_page -= 1
-
-        # Save the selections back to the session
-            request.session['selections'] = selections
-            request.session['last_page'] = current_page  # Save the last page in the session
+                current_page -= 1
+            request.session['last_page'] = current_page
 
             return redirect(f"{reverse('start_annotation')}?page={current_page}")
 
@@ -223,7 +192,6 @@ def handle_annotation_submission(request):
     else:
         messages.error(request, "You must submit the form with the POST method.")
         return redirect('start_annotation')
-
 
 def handle_pagination(request, action):
     # Get the current page number from the session or default to 1
