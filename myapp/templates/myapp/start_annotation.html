@@ -86,10 +86,11 @@
                 
                 <!-- <p>{{ review.content }}</p> -->
                 <h2>Reviews</h2>
-                <form method="post" action="{% url 'handle_annotation_submission' %}">
+                <form method="post" action="{% url 'submit_annotation' %}">
                     {% csrf_token %}
                     {% for review in page_obj %}
                     <div class="review">
+                        <input type="hidden" name="review_id" value="{{ review.id }}">
                         <p>{{ review.content }}</p>
                         <div>
                             <input type="radio" id="option1_{{ review.id }}" name="annotation_{{ review.id }}" value="1"
@@ -113,9 +114,7 @@
 
                     <div class="pagination button-container">
 
-                        {% if page_obj.has_next %}
                         <button type="submit" name="action" value="next" class="next-button">Next</button>
-                        {% endif %}
                     </div>
 
 
