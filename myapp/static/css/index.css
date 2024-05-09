@@ -1,79 +1,90 @@
-
- body {
-     font-family: 'Poppins', sans-serif;
-     margin: 0;
-     padding: 0;
-     display: flex;
-     justify-content: center;
-     align-items: center;
-     height: 100vh; /* Full viewport height */
-     background-color: #aaddf1;
-     color: #333;
- }
- 
- .container {
-     display: flex;
-     justify-content: space-between;
-     align-items: center;
-     width: 80%; /* Adjust the container width as needed */
-     max-width: 1200px; /* Optional: maximum width */
- }
- 
- .left-content {
-     width: 50%;
-     display: flex;
-     flex-direction: column;
-     justify-content: center;
-     align-items: center;
- }
- 
- .right-content {
-     width: 50%;
- }
- 
- .right-content img {
-     width: 100%;
-     height: auto;
- }
- 
- .start-button {
-     display: block;
-     background-color: #007bff; /* Adjust color as needed */
-     color: white;
-     padding: 10px 20px;
-     text-decoration: none;
-     border-radius: 5px;
-     text-align: center;
-     margin-top: 20px;
- }
- /* Style for input fields */
-.form-container input[type="url"], .form-container input[type="date"] {
-    padding: 10px;
-    margin: 5px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 80%; /* Adjust width as needed */
-    box-sizing: border-box; /* Include padding and border in width */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    background-color: #aaddf1;
+    color: #333;
 }
 
-/* Style for the form labels */
-.form-container label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%; /* Adjust the container width as needed */
+    max-width: 1200px; /* Optional: maximum width */
 }
 
-/* Style for the submit button */
-.form-container button {
+.left-content {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.right-content {
+    width: 50%;
+}
+
+.right-content img {
+    width: 100%;
+    height: auto;
+}
+
+/* Align buttons container */
+.button-container {
+    display: flex;
+    justify-content: center;
+}
+
+.start-button, .email-form button {
+    display: inline-block;
     background-color: #007bff; /* Adjust color as needed */
     color: white;
     padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 20px;
+    border: none; /* Remove border */
     cursor: pointer;
-    margin-top: 10px;
 }
 
-.form-container button:hover {
+.start-button:hover, .email-form button:hover {
+    background-color: #0056b3; /* Darker shade for hover effect */
+}
+
+.email-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group input[type="email"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 300px; /* Adjust width as needed */
+    box-sizing: border-box; /* Include padding and border in width */
+}
+
+.input-group button[type="submit"] {
+    margin-left: 10px;
+}
+
+.input-group button[type="submit"] {
+    width: auto; /* Adjust width as needed */
+    padding: 10px 20px;
+}
+
+.input-group button[type="submit"]:hover {
     background-color: #0056b3; /* Darker shade for hover effect */
 }

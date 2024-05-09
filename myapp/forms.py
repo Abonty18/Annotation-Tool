@@ -1,7 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import CustomUser
-
+from .models import CustomUser, StudentProject
 class StudentForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     age = forms.IntegerField(required=False)
@@ -53,11 +52,29 @@ class AppReviewForm(forms.Form):
     start_date = forms.DateField(label="Start Date", widget=forms.SelectDateWidget)
     end_date = forms.DateField(label="End Date", widget=forms.SelectDateWidget)
 
+
     def clean(self):
         cleaned_data = super().clean()
         start_date = cleaned_data.get("start_date")
         end_date = cleaned_data.get("end_date")
 
         if end_date < start_date:
+            raise forms.ValidationError("End date should be after the start date.")
+        return cleaned_data
+    
+class ProjectForm(forms.ModelForm):
+    # Add a file upload field to the form
+    uploaded_file = forms.FileField(label="Upload File", required=True)
+
+    class Meta:
+        model = StudentProject
+        fields = ['name', 'description', 'start_date', 'end_date', 'uploaded_file']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date")
+        end_date = cleaned_data.get("end_date")
+
+        if start_date and end_date and end_date < start_date:
             raise forms.ValidationError("End date should be after the start date.")
         return cleaned_data

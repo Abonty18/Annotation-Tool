@@ -10,6 +10,9 @@ from django.db import transaction
 
 from django.utils import timezone
 import datetime
+
+from django.utils import timezone
+import datetime
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -118,9 +121,14 @@ class StudentAnnotation(models.Model):
     ]
 
 class StudentProject(models.Model):
-    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, blank=True)
+    description = models.TextField()
+    start_date = models.DateField(default=timezone.now)
+    end_date = models.DateField(default=timezone.now)
     last_page = models.IntegerField(default=1)
+    uploaded_file = models.FileField(upload_to='uploads/%Y/%m/%d/')  # Define a FileField for file uploads
+
 
 class Annotation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name='user_annotations')
@@ -168,9 +176,6 @@ def move_annotated_reviews():
             else:
                 print(f"AnnotatedReview already exists for UnannotatedReview id {review.id}")
                 
-            # Optionally delete the annotations and review
-            # review.studentannotation_set.all().delete()
-            # review.delete()
 
     print("Completed moving reviews.")
 

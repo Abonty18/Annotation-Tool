@@ -42,6 +42,8 @@ from django.utils import timezone
 from .models import UnannotatedReview, ReviewLock
 from django.utils import timezone
 import datetime
+from .forms import ProjectForm
+
 @login_required
 def get_review_to_annotate(request):
     user = request.user
@@ -71,30 +73,56 @@ def get_review_to_annotate(request):
         return None
 
 
-logger = logging.getLogger(__name__)
 @login_required
+# def start_annotation(request):
+#     user = request.user
+#     review = get_review_to_annotate(request)  # Make sure this function is correctly implemented
+
+#     if not review:
+#         messages.info(request, "No reviews are currently available for annotation.")
+#         return render(request, 'index.html')
+
+#     reviews_list = [review] if review else []
+#     paginator = Paginator(reviews_list, 1)
+#     page_obj = paginator.get_page(1)
+
+#     selections = request.session.get('selections', {})
+#     selected_option = selections.get(str(review.id)) if review else None
+
+#     annotation_count = get_user_annotation_count(user)
+
+#     return render(request, 'myapp/start_annotation.html', {
+#         'page_obj': page_obj,
+#         'selected_option': selected_option,
+#         'annotation_count': annotation_count,
+#     })
 def start_annotation(request):
     user = request.user
-    review = get_review_to_annotate(request)  # Make sure this function is correctly implemented
+    projects = StudentProject.objects.filter(student=user)
+    if projects.exists():
+        # Render a template to display existing projects and provide an option to continue with one
+        return render(request, 'myapp/existing_projects.html', {'projects': projects})
+    else:
+        # If no projects exist, proceed with the regular annotation process
+        review = get_review_to_annotate(request)
+        if not review:
+            messages.info(request, "No reviews are currently available for annotation.")
+            return render(request, 'index.html')
 
-    if not review:
-        messages.info(request, "No reviews are currently available for annotation.")
-        return render(request, 'index.html')
+        reviews_list = [review] if review else []
+        paginator = Paginator(reviews_list, 1)
+        page_obj = paginator.get_page(1)
 
-    reviews_list = [review] if review else []
-    paginator = Paginator(reviews_list, 1)
-    page_obj = paginator.get_page(1)
+        selections = request.session.get('selections', {})
+        selected_option = selections.get(str(review.id)) if review else None
 
-    selections = request.session.get('selections', {})
-    selected_option = selections.get(str(review.id)) if review else None
+        annotation_count = get_user_annotation_count(user)
 
-    annotation_count = get_user_annotation_count(user)
-
-    return render(request, 'myapp/start_annotation.html', {
-        'page_obj': page_obj,
-        'selected_option': selected_option,
-        'annotation_count': annotation_count,
-    })
+        return render(request, 'myapp/start_annotation.html', {
+            'page_obj': page_obj,
+            'selected_option': selected_option,
+            'annotation_count': annotation_count,
+        })
 
 
 
@@ -460,9 +488,15 @@ def become_annotator(request):
 
 
 def index(request):
-    # Fetch all projects
-    projects = StudentProject.objects.all()
+    if request.method == 'POST':
+        if 'continue_project' in request.POST:
+            # Redirect to the unannotated reviews page
+            return redirect('start_annotation')
+        elif 'create_project' in request.POST:
+            # Redirect to the create project page
+            return redirect('create_project')
     return render(request, 'myapp/index.html')
+
 
 def start_test(request):
     # Fetch all reviews from the database
@@ -476,8 +510,8 @@ def start_test(request):
 
     return render(request, 'myapp/annotation_test.html', {'reviews': random_reviews})
 
-def create_project(request):
-    return render(request, 'create_project.html')
+# def create_project(request):
+#     return render(request, 'create_project.html')
 
 
 def sign_in(request):
@@ -577,3 +611,42 @@ def test_results(request):
     dummy_accuracy = 0  # You can change this as needed
     return render(request, 'myapp/test_results.html', {'accuracy': dummy_accuracy})
 
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import ProjectForm  # Import your project creation form
+
+# def create_project(request):
+#     if request.method == 'POST':
+#         form = ProjectForm(request.POST)
+#         if form.is_valid():
+#             # Save the form data to create a new StudentProject instance
+#             form.save()
+#             # Optionally, you can redirect the user to a success page or another URL
+#             return redirect('success_url_name')
+#     else:
+#         form = ProjectForm()
+
+#     return render(request, 'myapp/create_project.html', {'form': form})
+
+@login_required
+def create_project(request):
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Set the student field of the StudentProject instance
+            student_project = form.save(commit=False)
+            student_project.student = request.user  # Assuming request.user is the current student
+            student_project.save()
+            return redirect('project_list')
+        else:
+            print(form.errors)  # Print form errors to console
+    else:
+        form = ProjectForm()
+
+    return render(request, 'myapp/create_project.html', {'form': form})
+
+def project_list(request):
+    projects = StudentProject.objects.all()
+    return render(request, 'myapp/project_list.html', {'projects': projects})

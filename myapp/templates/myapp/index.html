@@ -11,13 +11,70 @@
         href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&family=Nunito+Sans:opsz@6..12&family=Oswald&family=PT+Sans&family=Playfair+Display&family=Poppins:wght@300&family=Roboto+Condensed:wght@300&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
+
+    <style>
+        /* Align buttons container */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .start-button, .email-form button {
+            display: inline-block;
+            background-color: #007bff; /* Adjust color as needed */
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            margin-right: 10px;
+            border: none; /* Remove border */
+            cursor: pointer;
+        }
+
+        .start-button:hover, .email-form button:hover {
+            background-color: #0056b3; /* Darker shade for hover effect */
+        }
+
+        .email-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group input[type="email"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 300px; /* Adjust width as needed */
+            box-sizing: border-box; /* Include padding and border in width */
+        }
+
+        .input-group button[type="submit"] {
+            margin-left: 10px;
+        }
+
+        .input-group button[type="submit"] {
+            width: auto; /* Adjust width as needed */
+            padding: 10px 20px;
+        }
+
+        .input-group button[type="submit"]:hover {
+            background-color: #0056b3; /* Darker shade for hover effect */
+        }
+    </style>
+
 </head>
 
 <body>
     <div class="container">
         <div class="left-content">
             <h1>Welcome to the Annotation Tool</h1>
-            <!-- Add this form in index.html -->
             <form method="post" action="{% url 'check_email' %}" class="email-form">
                 {% csrf_token %}
                 <div class="input-group">
@@ -25,14 +82,15 @@
                     <button type="submit" class="start-button">Start Annotation</button>
                 </div>
             </form>
-
-            <!-- <a href="{% url 'sign_in' %}?next={% url 'start_annotation' %}" class="start-button">Start Annotation</a> -->
-            <!-- <a href="{% url 'app_review_form' %}" class="start-button">Create a Project</a> Updated this line -->
+            <div class="button-container">
+                <a href="{% url 'create_project' %}" class="start-button">Create Project</a>
+            </div>
         </div>
         <div class="right-content">
             <img src="{% static 'image/welcome.png' %}" alt="Annotation Tool Image">
         </div>
     </div>
+    
 </body>
 
 </html>

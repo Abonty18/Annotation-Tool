@@ -2,11 +2,11 @@ from django.contrib import admin
 from django.urls import path
 from .views import sign_out
 from . import views
-from myapp.views import index, create_project, become_annotator,handle_annotation_submission, start_test, submit_test, test_results, sign_in, start_annotation
+from myapp.views import index,project_list, create_project, become_annotator,handle_annotation_submission, start_test, submit_test, test_results, sign_in, start_annotation
 
 urlpatterns = [
     # path('', index, name='home'),
-    path('create-project/', create_project, name='create_project'),
+    # path('create-project/', create_project, name='create_project'),
     path('start-test/', start_test, name='start_test'),
     path('submit-test/', submit_test, name='submit_test'),
     path('test_results/', test_results, name='test_results'),
@@ -21,6 +21,8 @@ urlpatterns = [
     path('check-email/', views.check_email, name='check_email'),
     path('submit_annotation/', views.submit_annotation, name='submit_annotation'),
     path('', views.index, name='index'),
+    path('create_project/', views.create_project, name='create_project'),
+    path('projects/', project_list, name='project_list'),
     
     # Other paths as needed...
 ]
