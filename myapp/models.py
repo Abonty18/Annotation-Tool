@@ -1,5 +1,7 @@
 # myapp/models.py
 # from myapp.models import UnannotatedReview
+from loguru import logger
+logger.add("logs/myproject_{time}.log", rotation="1 week", level="INFO")
 
 from django.db import models
 from django.contrib.auth.hashers import make_password

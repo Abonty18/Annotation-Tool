@@ -6,7 +6,7 @@ class Command(BaseCommand):
     help = 'Import reviews from an Excel file into UnannotatedReview model'
 
     def handle(self, *args, **kwargs):
-        excel_file_path = '11.8k.xlsx'  # Update with the path to your Excel file
+        excel_file_path = '21k.xlsx'  # Update with the path to your Excel file
         imported_count = 0  # Counter for imported reviews
 
         try:
