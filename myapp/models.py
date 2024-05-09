@@ -1,8 +1,3 @@
-# myapp/models.py
-# from myapp.models import UnannotatedReview
-from loguru import logger
-logger.add("logs/myproject_{time}.log", rotation="1 week", level="INFO")
-
 from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
@@ -144,8 +139,6 @@ class AnnotatedReview(models.Model):
     student1_annotation = models.IntegerField(null=True, blank=True)
     student2_annotation = models.IntegerField(null=True, blank=True)
     student3_annotation = models.IntegerField(null=True, blank=True)
-
-# Add this function to your models.py file
 
 
 @transaction.atomic
