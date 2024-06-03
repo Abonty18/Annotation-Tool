@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Classify Reviews</title>
+</head>
+<body>
+    <h1>Classify Reviews</h1>
+    <form method="post" enctype="multipart/form-data" action="{% url 'classify_reviews' %}">
+        {% csrf_token %}
+        <label for="file">Upload CSV file:</label>
+        <input type="file" name="file" id="file" required>
+        <button type="submit">Upload and Classify</button>
+    </form>
+</body>
+</html>

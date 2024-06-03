@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset='Windows-1252'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project List</title>
     <style>
@@ -35,8 +35,27 @@
         li:nth-child(even) {
             background-color: #f2f2f2;
         }
+
         li:nth-child(odd) {
             background-color: #f2f2f2;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+
+        .button.disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -48,6 +67,25 @@
                 <strong>Name:</strong> {{ project.name }}<br>
                 <strong>Description:</strong> {{ project.description }}<br>
                 <strong>File Name:</strong> {{ project.uploaded_file.name }}<br>
+                <form action="{% url 'train_dataset' project.id %}" method="post">
+                    {% csrf_token %}
+                    {% if 'privacy related bug' in project.labels or 'privacy related feature request' in project.labels or 'privacy related bug+feature request' in project.labels or 'not privacy related review' in project.labels %}
+                        <button type="submit" class="button">Classify Dataset</button>
+                    {% else %}
+                        <button type="button" class="button disabled" disabled>Train Dataset</button>
+                    {% endif %}
+                </form>
+                {% if project.labeled_file %}
+                    <a href="{% url 'download_labeled_file' project.id %}"><button>Download Labeled Dataset</button></a>
+                {% else %}
+                    <button disabled>Download Labeled Dataset</button>
+                {% endif %}
+                <form action="{% url 'classify_reviews' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="file" required>
+                    <input type="number" name="review_column" placeholder="Review Column Index" required>
+                    <button type="submit" class="button">Upload and Classify</button>
+                </form>
             </li>
         {% endfor %}
     </ul>

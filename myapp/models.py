@@ -7,9 +7,10 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import BaseUserManager
 from django.db.models import Count, Case, When
 from django.db import transaction
-
+from django.utils.crypto import get_random_string
 from django.utils import timezone
 import datetime
+from django.core.validators import FileExtensionValidator
 
 from django.utils import timezone
 import datetime
@@ -120,6 +121,7 @@ class StudentAnnotation(models.Model):
         ('review', 'student3')
     ]
 
+
 class StudentProject(models.Model):
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, blank=True)
@@ -127,7 +129,26 @@ class StudentProject(models.Model):
     start_date = models.DateField(default=timezone.now)
     end_date = models.DateField(default=timezone.now)
     last_page = models.IntegerField(default=1)
-    uploaded_file = models.FileField(upload_to='uploads/%Y/%m/%d/')  # Define a FileField for file uploads
+    uploaded_file = models.FileField(upload_to='uploads/%Y/%m/%d/', validators=[FileExtensionValidator(allowed_extensions=['csv'])])
+    review_column = models.CharField(max_length=100, default='0')
+    annotators_count = models.IntegerField(default=1)
+    sections_count = models.IntegerField(default=1)
+    labels = models.TextField(help_text="Comma-separated list of labels", default='')
+    output_format = models.CharField(max_length=100, choices=[('csv', 'CSV'), ('json', 'JSON')], default='csv')
+    unique_link = models.CharField(max_length=32, unique=True, blank=True)
+    labeled_file = models.FileField(upload_to='labeled_files/%Y/%m/%d/', null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.unique_link:
+            self.unique_link = get_random_string(length=32)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+
+
+
 
 
 class Annotation(models.Model):

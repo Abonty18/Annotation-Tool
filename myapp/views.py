@@ -1,8 +1,22 @@
 import logging
 from django.http import HttpResponseRedirect
-
+from django.core.mail import send_mail
+from django.urls import reverse
 from .models import move_annotated_reviews
-
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.core.files.base import ContentFile
+from django.core.exceptions import ValidationError
+import os
+import joblib
+import pandas as pd
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import StudentProject
+from django.conf import settings
 from django.db.models import F, Q
 import sys
 from django.db import transaction
@@ -96,14 +110,44 @@ def get_review_to_annotate(request):
 #         'selected_option': selected_option,
 #         'annotation_count': annotation_count,
 #     })
-def start_annotation(request):
+#prev one
+# def start_annotation(request):
+#     user = request.user
+#     projects = StudentProject.objects.filter(student=user)
+#     if projects.exists():
+#         # Render a template to display existing projects and provide an option to continue with one
+#         return render(request, 'myapp/existing_projects.html', {'projects': projects})
+#     else:
+#         # If no projects exist, proceed with the regular annotation process
+#         review = get_review_to_annotate(request)
+#         if not review:
+#             messages.info(request, "No reviews are currently available for annotation.")
+#             return render(request, 'index.html')
+
+#         reviews_list = [review] if review else []
+#         paginator = Paginator(reviews_list, 1)
+#         page_obj = paginator.get_page(1)
+
+#         selections = request.session.get('selections', {})
+#         selected_option = selections.get(str(review.id)) if review else None
+
+#         annotation_count = get_user_annotation_count(user)
+
+#         return render(request, 'myapp/start_annotation.html', {
+#             'page_obj': page_obj,
+#             'selected_option': selected_option,
+#             'annotation_count': annotation_count,
+#         })
+#new one
+@login_required
+def start_annotation(request, unique_link=None):
     user = request.user
-    projects = StudentProject.objects.filter(student=user)
-    if projects.exists():
-        # Render a template to display existing projects and provide an option to continue with one
-        return render(request, 'myapp/existing_projects.html', {'projects': projects})
+    if unique_link:
+        project = get_object_or_404(StudentProject, unique_link=unique_link)
     else:
-        # If no projects exist, proceed with the regular annotation process
+        project = None
+
+    if project:
         review = get_review_to_annotate(request)
         if not review:
             messages.info(request, "No reviews are currently available for annotation.")
@@ -122,7 +166,16 @@ def start_annotation(request):
             'page_obj': page_obj,
             'selected_option': selected_option,
             'annotation_count': annotation_count,
+            'project': project,
         })
+    else:
+        projects = StudentProject.objects.filter(student=user)
+        if projects.exists():
+            return render(request, 'myapp/existing_projects.html', {'projects': projects})
+        else:
+            messages.info(request, "No projects available.")
+            return render(request, 'index.html')
+
 
 
 
@@ -630,23 +683,264 @@ from .forms import ProjectForm  # Import your project creation form
 
 #     return render(request, 'myapp/create_project.html', {'form': form})
 
+
 @login_required
 def create_project(request):
     if request.method == 'POST':
         form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
-            # Set the student field of the StudentProject instance
             student_project = form.save(commit=False)
-            student_project.student = request.user  # Assuming request.user is the current student
+            student_project.student = request.user
             student_project.save()
-            return redirect('project_list')
+            return redirect('invite_annotators', project_id=student_project.id)
         else:
-            print(form.errors)  # Print form errors to console
+            print(form.errors)
     else:
         form = ProjectForm()
 
     return render(request, 'myapp/create_project.html', {'form': form})
 
+
+
+# from django.shortcuts import render, get_object_or_404
+# from django.core.mail import send_mail
+# from django.contrib.auth.decorators import login_required
+# from django.contrib import messages
+# from .models import StudentProject
+# from django.urls import reverse
+
+@login_required
+def invite_annotators(request, project_id):
+    project = get_object_or_404(StudentProject, id=project_id, student=request.user)
+    project_link = request.build_absolute_uri(reverse('start_annotation', args=[project.unique_link]))
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if email:
+            # Send an email invitation
+            send_mail(
+                'You are invited to annotate a project',
+                f'Click the link to annotate the project: {project_link}',
+                'labibafarah2998@gmail.com',
+                [email],
+                fail_silently=False,
+            )
+            messages.success(request, f'Invitation sent to {email}')
+        else:
+            messages.error(request, 'Please provide an email address')
+
+    return render(request, 'myapp/invite_annotators.html', {'project': project, 'project_link': project_link})
+
+
+
+@login_required
 def project_list(request):
     projects = StudentProject.objects.all()
+    desired_labels = [
+        'privacy related bug detection',
+        'privacy related feature request detection',
+        'privacy related bug+feature request detection',
+        'not privacy related review'
+    ]
+    for project in projects:
+        project_labels = [label.strip().lower() for label in project.labels.split(',')]
+        project.can_train = all(label in desired_labels for label in project_labels)
+
     return render(request, 'myapp/project_list.html', {'projects': projects})
+
+
+import os
+import io
+import joblib
+import pandas as pd
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.core.files.base import ContentFile
+import logging
+from .models import StudentProject  # Ensure your models are imported
+
+logger = logging.getLogger(__name__)
+
+import chardet
+
+@login_required
+@csrf_exempt
+def train_dataset(request, project_id):
+    project = get_object_or_404(StudentProject, id=project_id)
+
+    # Load the dataset and models
+    file_path = project.uploaded_file.path
+    review_column_index = int(project.review_column)  # Convert the column number to integer
+
+    df = None
+    # Ensure the file is a CSV
+    file_extension = os.path.splitext(file_path)[1].lower()
+    if file_extension != '.csv':
+        return JsonResponse({'status': 'error', 'message': 'Uploaded file is not a CSV.'})
+
+    # Detect encoding with chardet
+    with open(file_path, 'rb') as f:
+        raw_data = f.read()
+        result = chardet.detect(raw_data)
+        encoding = result['encoding']
+
+    if not encoding:
+        return JsonResponse({'status': 'error', 'message': 'Failed to detect encoding of the file.'})
+
+    delimiters = [',', ';', '\t', '|']
+    file_content = raw_data.decode(encoding)
+
+    for delimiter in delimiters:
+        try:
+            df = pd.read_csv(io.StringIO(file_content), delimiter=delimiter)
+            # Check if the specified column index is within the range
+            if review_column_index < len(df.columns):
+                review_column_name = df.columns[review_column_index]
+                logger.info(f"Successfully read the file with detected encoding={encoding} and delimiter={delimiter}")
+                break
+        except (pd.errors.ParserError, ValueError, IndexError) as e:
+            logger.error(f"Failed to read file with detected encoding={encoding} and delimiter={delimiter}: {e}")
+            continue
+
+    if df is None or review_column_index >= len(df.columns):
+        return JsonResponse({'status': 'error', 'message': f'Failed to read the uploaded file with supported encodings and delimiters. Invalid column index: {review_column_index}.'})
+
+    # Load the models from the model_files directory
+    model_path = settings.MODEL_FILES_DIR
+    tfidf_vectorizer = joblib.load(os.path.join(model_path, 'tfidf_vectorizer.pkl'))
+    scaler = joblib.load(os.path.join(model_path, 'scaler.pkl'))
+    best_logreg_model = joblib.load(os.path.join(model_path, 'best_logreg_model.pkl'))
+    label_encoder = joblib.load(os.path.join(model_path, 'label_encoder.pkl'))
+
+    # Preprocess the data
+    reviews = df[review_column_name].astype(str)
+    tfidf_reviews = tfidf_vectorizer.transform(reviews)
+    scaled_reviews = scaler.transform(tfidf_reviews.toarray())
+
+    # Predict the labels
+    predicted_labels = best_logreg_model.predict(scaled_reviews)
+    predicted_labels = label_encoder.inverse_transform(predicted_labels)
+
+    # Add the labels to the DataFrame
+    df['Predicted_Labels'] = predicted_labels
+
+    # Save the labeled dataset to a CSV file
+    labeled_file_name = f'labeled_{project.uploaded_file.name}'
+    labeled_file_path = os.path.join(settings.MEDIA_ROOT, 'labeled_files', labeled_file_name)
+    df.to_csv(labeled_file_path, index=False)
+
+    # Save the labeled file path in the project model
+    project.labeled_file.save(labeled_file_name, ContentFile(open(labeled_file_path, 'rb').read()))
+    project.save()
+
+    return JsonResponse({'status': 'success', 'message': 'Dataset has been labeled and is ready for download.'})
+
+@login_required
+def download_labeled_file(request, project_id):
+    project = get_object_or_404(StudentProject, id=project_id)
+    if not project.labeled_file:
+        return JsonResponse({'status': 'error', 'message': 'No labeled file available for this project.'})
+
+    response = HttpResponse(project.labeled_file, content_type='application/octet-stream')
+    response['Content-Disposition'] = f'attachment; filename="{project.labeled_file.name}"'
+    return response
+
+
+import os
+import joblib
+import pandas as pd
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+@csrf_exempt
+def classify_reviews(request):
+    if request.method == 'POST':
+        uploaded_file = request.FILES.get('file')
+        review_column_index = int(request.POST.get('review_column', 0)) - 1  # Adjust for zero-based indexing
+
+        if not uploaded_file:
+            return JsonResponse({'status': 'error', 'message': 'No file uploaded.'})
+
+        # Try reading the file with multiple encodings and delimiters
+        encodings = ['utf-8', 'utf-16', 'windows-1252', 'iso-8859-1']
+        delimiters = [',', ';', '\t', '|']
+        df = None
+        errors = []
+
+        for encoding in encodings:
+            for delimiter in delimiters:
+                try:
+                    uploaded_file.seek(0)  # Reset file pointer to the beginning
+                    df = pd.read_csv(uploaded_file, encoding=encoding, delimiter=delimiter)
+                    logger.debug(f"Successfully read file with encoding={encoding} and delimiter={delimiter}")
+                    break
+                except UnicodeDecodeError as e:
+                    error_message = f"UnicodeDecodeError with encoding={encoding} and delimiter={delimiter}: {e}"
+                    errors.append(error_message)
+                    logger.error(error_message)
+                except pd.errors.EmptyDataError as e:
+                    error_message = f"EmptyDataError with encoding={encoding} and delimiter={delimiter}: {e}"
+                    errors.append(error_message)
+                    logger.error(error_message)
+                except pd.errors.ParserError as e:
+                    error_message = f"ParserError with encoding={encoding} and delimiter={delimiter}: {e}"
+                    errors.append(error_message)
+                    logger.error(error_message)
+            if df is not None:
+                break
+
+        if df is None:
+            return JsonResponse({'status': 'error', 'message': 'Failed to read the uploaded file with supported encodings and delimiters.', 'errors': errors})
+
+        # Ensure the review column index is valid
+        if review_column_index >= len(df.columns) or review_column_index < 0:
+            return JsonResponse({'status': 'error', 'message': 'Invalid review column index.'})
+
+        # Extract the review content based on the column index
+        review_content = df.iloc[:, review_column_index]
+
+        # Load the models from the model_files directory
+        model_path = settings.MODEL_FILES_DIR
+        tfidf_vectorizer = joblib.load(os.path.join(model_path, 'tfidf_vectorizer.pkl'))
+        scaler = joblib.load(os.path.join(model_path, 'scaler.pkl'))
+        best_logreg_model = joblib.load(os.path.join(model_path, 'best_logreg_model.pkl'))
+        label_encoder = joblib.load(os.path.join(model_path, 'label_encoder.pkl'))
+
+        # Preprocess the data
+        reviews = review_content.astype(str)
+        tfidf_reviews = tfidf_vectorizer.transform(reviews)
+        scaled_reviews = scaler.transform(tfidf_reviews.toarray())
+
+        # Predict the labels
+        predicted_labels = best_logreg_model.predict(scaled_reviews)
+        predicted_labels = label_encoder.inverse_transform(predicted_labels)
+
+        # Add the labels to the DataFrame
+        df['predicted_labels'] = predicted_labels
+
+        # Ensure the 'labeled_files' directory exists
+        labeled_file_dir = os.path.join(settings.MEDIA_ROOT, 'labeled_files')
+        if not os.path.exists(labeled_file_dir):
+            os.makedirs(labeled_file_dir)
+
+        # Save the labeled DataFrame to a CSV file
+        labeled_file_name = 'labeled_reviews.csv'
+        labeled_file_path = os.path.join(labeled_file_dir, labeled_file_name)
+        df.to_csv(labeled_file_path, index=False)
+
+        # Prepare the file for download
+        with open(labeled_file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename={labeled_file_name}'
+            return response
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})

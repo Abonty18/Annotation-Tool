@@ -21,7 +21,7 @@ class Command(BaseCommand):
             # Create a dictionary to accumulate annotation counts
             annotation_counts = defaultdict(int)
 
-            with open(backup_file, 'r', encoding='utf-8') as file:
+            with open(backup_file, 'r', encoding='Windows-1252') as file:
                 data = json.load(file)
 
             for item in data:

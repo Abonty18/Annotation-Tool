@@ -2,9 +2,12 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="Windows-1252">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Project</title>
+    <div class="button-container">
+        <a href="{% url 'project_list' %}" class="button">Back to Your Projects</a>
+    </div>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,7 +35,8 @@
         input[type="text"],
         input[type="date"],
         textarea,
-        input[type="file"] {
+        input[type="file"],
+        select {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -61,26 +65,7 @@
     <h1>Create Project</h1>
     <form method="post" action="{% url 'create_project' %}" enctype="multipart/form-data">
         {% csrf_token %}
-        <div>
-            <label for="name">Project Name:</label>
-            <input type="text" id="name" name="name" required>
-        </div>
-        <div>
-            <label for="description">Description:</label>
-            <textarea id="description" name="description" required></textarea>
-        </div>
-        <div>
-            <label for="start_date">Start Date:</label>
-            <input type="date" id="start_date" name="start_date" required>
-        </div>
-        <div>
-            <label for="end_date">End Date:</label>
-            <input type="date" id="end_date" name="end_date" required>
-        </div>
-        <div>
-            <label for="uploaded_file">Upload File:</label>
-            <input type="file" id="uploaded_file" name="uploaded_file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
-        </div>
+        {{ form.as_p }}
         <button type="submit">Create Project</button>
     </form>
 </body>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invite Annotators</title>
+</head>
+<body>
+    <h1>Invite Annotators</h1>
+    <p>Share this link with your annotators:</p>
+    <input type="text" id="projectLink" value="{{ project_link }}" readonly>
+    <button onclick="copyLink()">Copy Link</button>
+
+    <form method="post" action="">
+        {% csrf_token %}
+        <label for="email">Invite by email:</label>
+        <input type="email" name="email" id="email" required>
+        <button type="submit">Send Invitation</button>
+        <div class="button-container">
+            <a href="{% url 'project_list' %}" class="button">Back to Your Projects</a>
+        </div>
+    </form>
+
+    <script>
+        function copyLink() {
+            var copyText = document.getElementById("projectLink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); /* For mobile devices */
+            navigator.clipboard.writeText(copyText.value);
+            alert("Copied the link: " + copyText.value);
+        }
+    </script>
+</body>
+</html>
