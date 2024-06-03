@@ -550,6 +550,24 @@ def index(request):
             return redirect('create_project')
     return render(request, 'myapp/index.html')
 
+from django.shortcuts import redirect
+
+def index(request):
+    if request.method == 'POST':
+        if 'continue_project' in request.POST:
+            # Redirect to the unannotated reviews page
+            return redirect('start_annotation')
+        elif 'create_project' in request.POST:
+            # Check if the user is authenticated
+            if request.user.is_authenticated:
+                return redirect('create_project')
+            else:
+                # Save the next URL in session and redirect to enter_password
+                request.session['next_url'] = reverse('create_project')
+                return redirect('enter_password')
+    return render(request, 'myapp/index.html')
+
+
 
 def start_test(request):
     # Fetch all reviews from the database
@@ -583,6 +601,23 @@ def sign_in(request):
 
 
 
+# def enter_password(request):
+#     email = request.session.get('email_for_signin')
+#     if not email:
+#         return redirect('index')  # Redirect to index if no email in session
+
+#     if request.method == 'POST':
+#         password = request.POST.get('password')
+#         user = authenticate(request, username=email, password=password)
+#         if user is not None:
+#             login(request, user)
+#             return redirect('start_annotation')
+#         else:
+#             messages.error(request, 'Invalid password. Please try again.')
+
+#     return render(request, 'myapp/enter_password.html', {'email': email})
+from django.urls import reverse
+
 def enter_password(request):
     email = request.session.get('email_for_signin')
     if not email:
@@ -593,7 +628,13 @@ def enter_password(request):
         user = authenticate(request, username=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('start_annotation')
+            # Get the unique_link for the user's project
+            project = StudentProject.objects.filter(student=user).first()
+            if project:
+                return redirect(reverse('start_annotation', args=[project.unique_link]))
+            else:
+                messages.error(request, 'No project found for this user.')
+                return redirect('index')
         else:
             messages.error(request, 'Invalid password. Please try again.')
 

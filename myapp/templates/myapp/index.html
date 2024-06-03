@@ -1,8 +1,7 @@
-{% load static %} <!-- Add this line at the top of your template -->
+{% load static %}
 
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Landing Page</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +12,6 @@
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
 
     <style>
-        /* Align buttons container */
         .button-container {
             display: flex;
             justify-content: center;
@@ -68,9 +66,7 @@
             background-color: #0056b3; /* Darker shade for hover effect */
         }
     </style>
-
 </head>
-
 <body>
     <div class="container">
         <div class="left-content">
@@ -79,18 +75,19 @@
                 {% csrf_token %}
                 <div class="input-group">
                     <input type="email" id="email" name="email" placeholder="Enter your email" required>
-                    <button type="submit" class="start-button">Start Annotation</button>
+                    <button type="submit" class="start-button">Continue with the projects</button>
                 </div>
             </form>
             <div class="button-container">
-                <a href="{% url 'create_project' %}" class="start-button">Create Project</a>
+                <form method="post" action="{% url 'index' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="create_project" class="start-button">Create Project</button>
+                </form>
             </div>
         </div>
         <div class="right-content">
             <img src="{% static 'image/welcome.png' %}" alt="Annotation Tool Image">
         </div>
     </div>
-    
 </body>
-
 </html>
