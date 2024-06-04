@@ -1,0 +1,95 @@
+
+body {
+     font-family: 'Poppins', sans-serif;
+     margin: 0;
+     padding: 0;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     height: 100vh; /* Full viewport height */
+     background-color: #80eaaa;
+     color: #333;
+ }
+ 
+ .container {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     width: 80%; /* Adjust the container width as needed */
+     max-width: 1200px; /* Optional: maximum width */
+ }
+ 
+ .left-content {
+     width: 50%;
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+ }
+ 
+ .right-content {
+     width: 50%;
+ }
+ 
+ .right-content img {
+     width: 100%;
+     height: auto;
+ }
+ 
+ form {
+     display: flex;
+     flex-direction: column;
+     align-items: start;
+     gap: 10px;
+ }
+ 
+ label {
+     font-size: 16px;
+     color: #333;
+     margin-bottom: 5px;
+ }
+ 
+
+
+
+
+
+
+
+ /* CSS in login.css */
+.input-group {
+     display: flex;
+     align-items: center;
+ }
+ 
+ input[type=email] {
+     padding: 8px 12px;
+     border: 2px solid #ddd;
+     border-radius: 4px;
+     font-size: 14px;
+     margin-right: 10px; /* Space between input and button */
+     flex-grow: 1; /* Allows the input to take up available space */
+ }
+ 
+
+ input[type=email]:focus {
+     border-color: #a2a2a2;
+     outline: none;
+ }
+ 
+ .button {
+     padding: 10px 15px;
+     background-color: #4CAF50;
+     color: white;
+     border: none;
+     border-radius: 4px;
+     cursor: pointer;
+     font-size: 16px;
+     justify-content: center;
+     align-items: center;
+ }
+ 
+ .button:hover {
+     background-color: #45a049;
+ }
+ 

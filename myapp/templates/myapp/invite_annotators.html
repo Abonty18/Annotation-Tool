@@ -76,9 +76,43 @@
             align-self: flex-start;
             margin-bottom: 5px;
         }
+
+        /* Loading screen */
+        .loading {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.8);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .loading .spinner {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #007bff;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Labeling dataset. Please wait...</p>
+    </div>
+
     <h1>Invite Annotators</h1>
     <p>Share this link with your annotators:</p>
     <input type="text" id="projectLink" value="{{ project_link }}" readonly>
@@ -89,10 +123,12 @@
         <label for="email">Invite by email:</label>
         <input type="email" name="email" id="email" required>
         <button type="submit">Send Invitation</button>
-        <div class="button-container">
-            <a href="{% url 'project_list' %}" class="button">Back to Your Projects</a>
-        </div>
     </form>
+
+    <div class="button-container">
+        <!-- <a href="{% url 'classify_reviews'%}" class="button" onclick="showLoading()">Classify Your Dataset</a> -->
+        <a href="{% url 'project_list' %}" class="button">Back to Your Projects</a>
+    </div>
 
     <script>
         function copyLink() {
@@ -101,6 +137,10 @@
             copyText.setSelectionRange(0, 99999); /* For mobile devices */
             navigator.clipboard.writeText(copyText.value);
             alert("Copied the link: " + copyText.value);
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
         }
     </script>
 </body>

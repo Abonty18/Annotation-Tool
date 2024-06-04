@@ -61,9 +61,11 @@ class AppReviewForm(forms.Form):
             raise forms.ValidationError("End date should be after the start date.")
         return cleaned_data
 
+
 class InviteAnnotatorForm(forms.Form):
     email = forms.EmailField(label='Annotator Email', required=True)
-    
+
+
 class ProjectForm(forms.ModelForm):
     uploaded_file = forms.FileField(label="Upload File", required=True)
     review_column = forms.CharField(label="Review Column", required=True)

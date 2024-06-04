@@ -1,0 +1,195 @@
+body {
+    font-family: 'Inria Sans', sans-serif;
+    margin: 0; /* Set margins to 0 to prevent any unwanted space */
+    padding: 0; /* Set padding to 0 to prevent any unwanted space */
+    background-color: #ddfffd;
+    color: #2f2e2f;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    justify-content: center;
+    align-items: center;
+    /* background-image: url('/static/image/safe.svg');  */
+    background-size: cover; /* Cover the entire page */
+    /* Center the image */
+    background-attachment: fixed; /* Fixed background */
+    background-size: 10%;
+    background-repeat: no-repeat; 
+    background-position: bottom right;
+ 
+  
+}
+
+.container {
+
+    width: auto; /* Take the width as per content */
+    max-width: 1200px; /* Max width of the container */
+    margin: 0 auto; /* Center the container */
+/* Padding inside the container */
+    box-sizing: border-box; /* Include padding in width calculations */
+}
+
+.main-heading {
+    margin: 20px 0; /* Spacing above and below the main heading */
+}
+
+.content {
+    display: flex;
+    flex-wrap: wrap; /* Wrap onto the next line if not enough space */
+    justify-content: space-between;
+    width: 100%; /* Full width */
+}
+
+.guidelines, .reviews {
+    flex: 1; /* Take equal space */
+    margin: 10px; /* Space around each section */
+    max-width: 48%; /* Maximum width */
+}
+
+.guidelines {
+    padding-right: 20px; /* Space between guidelines and reviews */
+    
+}
+
+.review {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 2px solid #00a2ff; /* Add your desired border color here, for example, blue (#007bff) */
+    border-radius: 5px;
+    background-color: rgb(255, 255, 255);
+}
+
+
+.review p {
+    font-size: 1.1em;
+}
+
+.annotations {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.annotations label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+.heading-container {
+    text-align: center; /* Centers the heading horizontally */
+    margin-bottom: 8pt; /* Optional: Adds some space below the heading */
+    font-weight: bold;
+}
+input[type="radio"] {
+    margin-right: 5px;
+}
+
+.guidelines table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgb(160, 197, 255);
+    border-radius: 5px;
+}
+
+.guidelines th, .guidelines td {
+    border: 1px solid #f5f3f3;
+    padding: 8px;
+}
+
+.guidelines th {
+    background-color: #cfcccc;
+    text-align: left;
+}
+
+.guidelines td ul, .guidelines td ol {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.pagination {
+    margin-top: 20px;
+    width: 100%; /* Full width */
+}
+
+/* Style the "Save" button */
+.save-button {
+    background-color: #2ecc71;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px; /* Add margin for spacing from other content */
+}
+
+/* Style the container for the "Save" button */
+.save-button-container {
+    text-align: center; /* Center the content horizontally */
+    margin-top: 20px; /* Add space between the "Next" button and the "Save" button */
+}
+
+/* Style the "Save" button */
+.save-button {
+    background-color: #2ecc71;
+    color: white;
+    
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-button:hover {
+    background-color: #27ae60;
+}
+
+
+.button-container {
+    text-align: center;
+}
+
+/* Style the "Next" button */
+.next-button {
+    background-color: #62a6ff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px; /* Add margin for spacing between buttons */
+}
+
+.next-button:hover {
+    background-color: #4b99ff;
+}
+.exit-button-container {
+    position: fixed;
+    bottom: 20px; /* Adjust the distance from the bottom as needed */
+    right: 20px; /* Adjust the distance from the right as needed */
+}
+
+.exit-button {
+
+    padding: 10px 15px; /* Adjust padding as needed for your design */
+    background-color: #1bb957; /* Button background color */
+    color: #fff; /* Button text color */
+    text-decoration: none; /* Remove underline from the link */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Add rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Add a smooth hover effect */
+}
+
+.exit-button:hover {
+    background-color: #169647; /* Button background color on hover */
+}
+
+#annotation-count-container {
+    position: fixed; /* Fixed position */
+    top: 10px; /* 10px from the top */
+    right: 10px; /* 10px from the right */
+    background-color: #fff; /* Change as needed */
+    padding: 5px;
+    z-index: 1000; /* Ensure it's above other items */
+    border-radius: 5px; /* Optional: for rounded corners */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: for shadow */
+}

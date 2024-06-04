@@ -32,14 +32,6 @@
             color: #4caf50;
         }
 
-        li:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        li:nth-child(odd) {
-            background-color: #f2f2f2;
-        }
-
         .button {
             background-color: #4CAF50;
             border: none;
@@ -57,9 +49,43 @@
             background-color: #ddd;
             cursor: not-allowed;
         }
+
+        /* Loading screen */
+        .loading {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.8);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .loading .spinner {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #4CAF50;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Labeling dataset. Please wait...</p>
+    </div>
+
     <h1>Project List</h1>
     <ul>
         {% for project in projects %}
@@ -67,27 +93,19 @@
                 <strong>Name:</strong> {{ project.name }}<br>
                 <strong>Description:</strong> {{ project.description }}<br>
                 <strong>File Name:</strong> {{ project.uploaded_file.name }}<br>
-                <form action="{% url 'train_dataset' project.id %}" method="post">
-                    {% csrf_token %}
-                    {% if 'privacy related bug' in project.labels or 'privacy related feature request' in project.labels or 'privacy related bug+feature request' in project.labels or 'not privacy related review' in project.labels %}
-                        <button type="submit" class="button">Classify Dataset</button>
-                    {% else %}
-                        <button type="button" class="button disabled" disabled>Train Dataset</button>
-                    {% endif %}
-                </form>
-                {% if project.labeled_file %}
+                <!-- {% if project.labeled_file %}
                     <a href="{% url 'download_labeled_file' project.id %}"><button>Download Labeled Dataset</button></a>
                 {% else %}
-                    <button disabled>Download Labeled Dataset</button>
-                {% endif %}
-                <form action="{% url 'classify_reviews' %}" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="file" name="file" required>
-                    <input type="number" name="review_column" placeholder="Review Column Index" required>
-                    <button type="submit" class="button">Upload and Classify</button>
-                </form>
+                    <a href="{% url 'train_dataset' project.id %}" class="button" onclick="showLoading()">Classify Your Dataset</a>
+                {% endif %} -->
             </li>
         {% endfor %}
     </ul>
+
+    <script>
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
+        }
+    </script>
 </body>
 </html>

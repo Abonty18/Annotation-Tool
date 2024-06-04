@@ -1,13 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="Windows-1252">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Project</title>
-    <div class="button-container">
-        <a href="{% url 'project_list' %}" class="button">Back to Your Projects</a>
-    </div>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,7 +11,7 @@
             padding: 20px;
         }
 
-        h1 {
+        h1, h2 {
             color: #333;
         }
 
@@ -24,6 +20,7 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
         label {
@@ -58,16 +55,113 @@
         button[type="submit"]:hover {
             background-color: #45a049;
         }
+
+        .tab {
+            display: none;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        .tab-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons button {
+            background-color: #ccc;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .tab-buttons button.active {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .project-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .project-list li {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .project-list li strong {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+        }
     </style>
 </head>
-
 <body>
-    <h1>Create Project</h1>
-    <form method="post" action="{% url 'create_project' %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Create Project</button>
-    </form>
-</body>
+    <div class="tab-buttons">
+        <button class="tab-button active" data-tab="create-project">Create Project</button>
+        <button class="tab-button" data-tab="classify-dataset">Classify Dataset</button>
+        <button class="tab-button" data-tab="back-projects">Back to Your Projects</button>
+    </div>
 
+    <div id="create-project" class="tab active">
+        <h1>Create Project</h1>
+        <form method="post" action="{% url 'create_project' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Create Project</button>
+        </form>
+    </div>
+
+    <div id="classify-dataset" class="tab">
+        <h2>Classify Dataset</h2>
+        <form action="{% url 'classify_reviews' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="file">
+            <input type="number" name="review_column" placeholder="Review Column Index">
+            <button type="submit">Classify Dataset</button>
+        </form>
+    </div>
+
+    <div id="back-projects" class="tab project-list">
+        <h1>Project List</h1>
+        <ul>
+            {% for project in projects %}
+                <li>
+                    <strong>Name:</strong> {{ project.name }}<br>
+                    <strong>Description:</strong> {{ project.description }}<br>
+                    <strong>File Name:</strong> {{ project.uploaded_file.name }}<br>
+                    <!-- {% if project.labeled_file %}
+                        <a href="{% url 'download_labeled_file' project.id %}"><button>Download Labeled Dataset</button></a>
+                    {% else %}
+                        <a href="{% url 'train_dataset' project.id %}" class="button" onclick="showLoading()">Classify Your Dataset</a>
+                    {% endif %} -->
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                const tabId = button.getAttribute('data-tab');
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                    if (tab.id === tabId) {
+                        tab.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
 </html>

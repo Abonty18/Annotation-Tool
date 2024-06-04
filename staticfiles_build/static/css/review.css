@@ -1,0 +1,54 @@
+body {
+     font-family: 'Nunito Sans', sans-serif;
+     margin: 0;
+     padding: 0;
+     background-color: #e9fff1;
+ }
+ .container {
+     width: 90%;
+     margin: auto;
+     padding-top: 20px;
+ }
+ .section-header {
+     background-color: #f2f2f2;
+     border-radius: 5px;
+     text-align: center;
+     padding: 10px;
+     margin-bottom: 20px;
+     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+ }
+ table {
+     width: 100%;
+     border-collapse: collapse;
+ }
+ th, td {
+     padding: 10px;
+     border: 1px solid #808080;
+     text-align: left;
+ }
+ th {
+     background-color: #f2f2f2;
+ }
+ .agree-disagree {
+     text-align: center;
+ }
+ .agree-disagree input {
+     margin-right: 10px;
+ }
+ /* ... other styles ... */
+
+/* Table column widths */
+th.reviews, td.reviews {
+     width: 50%; /* Decrease as needed */
+ }
+ 
+ th.classification, td.classification {
+     width: 30%; /* Adjust as needed */
+ }
+ 
+ th.agree-disagree, td.agree-disagree {
+     width: 20%; /* Increase as needed */
+ }
+ 
+ /* Ensure that the sum of the widths does not exceed 100% */
+ 

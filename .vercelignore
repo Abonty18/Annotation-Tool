@@ -1,7 +1,6 @@
 __pycache__/
 *.pyc
 media/
-
 .env
 *.log
 *.sqlite3

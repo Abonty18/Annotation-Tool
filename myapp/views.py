@@ -144,6 +144,7 @@ def start_annotation(request, unique_link=None):
     user = request.user
     if unique_link:
         project = get_object_or_404(StudentProject, unique_link=unique_link)
+        request.session['unique_link'] = unique_link  # Store the unique_link in the session
     else:
         project = None
 
@@ -177,8 +178,6 @@ def start_annotation(request, unique_link=None):
             return render(request, 'index.html')
 
 
-
-
     
 # from django.shortcuts import get_object_or_404
 # from .models import StudentAnnotation, ReviewLock, UnannotatedReview
@@ -186,6 +185,7 @@ def start_annotation(request, unique_link=None):
 # from django.contrib.auth.decorators import login_required
 # from django.shortcuts import redirect
 
+@login_required
 def submit_annotation(request):
     if request.method == "POST":
         review_id = request.POST.get('review_id')
@@ -200,8 +200,6 @@ def submit_annotation(request):
             )
             
             if not created:
-                # If the annotation was not created, it means it already exists.
-                # Update the existing annotation with the new value for the correct student.
                 if annotation.student2 is None:
                     annotation.student2 = user
                     annotation.student2annotation = annotation_value
@@ -209,27 +207,22 @@ def submit_annotation(request):
                     annotation.student3 = user
                     annotation.student3annotation = annotation_value
                 else:
-                    # All annotation slots are filled. Handle this case appropriately.
                     messages.error(request, "This review has already been fully annotated.")
-                    return redirect('start_annotation')
+                    return redirect('start_annotation', unique_link=request.session.get('unique_link'))
                 
                 annotation.save()
 
-            # After saving the annotation, update the annotation count for the review.
             update_annotation_count(review_id)
-            
-            # Release the lock on the review if you're using review locks.
             ReviewLock.objects.filter(review_id=review_id, user=user).update(is_locked=False)
             
-            # Redirect to get the next review for annotation.
             messages.success(request, "Your annotation has been saved.")
-            return redirect('start_annotation')
+            return redirect('start_annotation', unique_link=request.session.get('unique_link'))
         else:
             messages.error(request, "You must select an annotation value.")
-            return redirect('start_annotation')
+            return redirect('start_annotation', unique_link=request.session.get('unique_link'))
     else:
-        # If it's not a POST request, handle accordingly.
-        return redirect('start_annotation')
+        return redirect('start_annotation', unique_link=request.session.get('unique_link'))
+
 
 def update_annotation_count(review_id):
     review = get_object_or_404(UnannotatedReview, id=review_id)
@@ -253,11 +246,9 @@ def check_email(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         if CustomUser.objects.filter(email=email).exists():
-            # Redirect to enter_password page with email in session
             request.session['email_for_signin'] = email
             return redirect('enter_password')
         else:
-            # Redirect to signup page with email as query parameter
             return redirect(f"{reverse('become_annotator')}?email={email}")
     return redirect('index')
 
@@ -543,26 +534,11 @@ def become_annotator(request):
 def index(request):
     if request.method == 'POST':
         if 'continue_project' in request.POST:
-            # Redirect to the unannotated reviews page
             return redirect('start_annotation')
         elif 'create_project' in request.POST:
-            # Redirect to the create project page
-            return redirect('create_project')
-    return render(request, 'myapp/index.html')
-
-from django.shortcuts import redirect
-
-def index(request):
-    if request.method == 'POST':
-        if 'continue_project' in request.POST:
-            # Redirect to the unannotated reviews page
-            return redirect('start_annotation')
-        elif 'create_project' in request.POST:
-            # Check if the user is authenticated
             if request.user.is_authenticated:
                 return redirect('create_project')
             else:
-                # Save the next URL in session and redirect to enter_password
                 request.session['next_url'] = reverse('create_project')
                 return redirect('enter_password')
     return render(request, 'myapp/index.html')
@@ -616,19 +592,18 @@ def sign_in(request):
 #             messages.error(request, 'Invalid password. Please try again.')
 
 #     return render(request, 'myapp/enter_password.html', {'email': email})
-from django.urls import reverse
+
 
 def enter_password(request):
     email = request.session.get('email_for_signin')
     if not email:
-        return redirect('index')  # Redirect to index if no email in session
+        return redirect('index')
 
     if request.method == 'POST':
         password = request.POST.get('password')
         user = authenticate(request, username=email, password=password)
         if user is not None:
             login(request, user)
-            # Get the unique_link for the user's project
             project = StudentProject.objects.filter(student=user).first()
             if project:
                 return redirect(reverse('start_annotation', args=[project.unique_link]))
@@ -639,6 +614,7 @@ def enter_password(request):
             messages.error(request, 'Invalid password. Please try again.')
 
     return render(request, 'myapp/enter_password.html', {'email': email})
+
 
 
 
@@ -739,7 +715,10 @@ def create_project(request):
     else:
         form = ProjectForm()
 
-    return render(request, 'myapp/create_project.html', {'form': form})
+    projects = StudentProject.objects.filter(student=request.user)
+    return render(request, 'myapp/create_project.html', {'form': form, 'projects': projects})
+
+
 
 
 
@@ -751,6 +730,11 @@ def create_project(request):
 # from django.urls import reverse
 
 @login_required
+def project_list(request):
+    projects = StudentProject.objects.filter(student=request.user)
+    return render(request, 'myapp/project_list.html', {'projects': projects})
+
+@login_required
 def invite_annotators(request, project_id):
     project = get_object_or_404(StudentProject, id=project_id, student=request.user)
     project_link = request.build_absolute_uri(reverse('start_annotation', args=[project.unique_link]))
@@ -758,7 +742,6 @@ def invite_annotators(request, project_id):
     if request.method == 'POST':
         email = request.POST.get('email')
         if email:
-            # Send an email invitation
             send_mail(
                 'You are invited to annotate a project',
                 f'Click the link to annotate the project: {project_link}',
@@ -772,22 +755,6 @@ def invite_annotators(request, project_id):
 
     return render(request, 'myapp/invite_annotators.html', {'project': project, 'project_link': project_link})
 
-
-
-@login_required
-def project_list(request):
-    projects = StudentProject.objects.all()
-    desired_labels = [
-        'privacy related bug detection',
-        'privacy related feature request detection',
-        'privacy related bug+feature request detection',
-        'not privacy related review'
-    ]
-    for project in projects:
-        project_labels = [label.strip().lower() for label in project.labels.split(',')]
-        project.can_train = all(label in desired_labels for label in project_labels)
-
-    return render(request, 'myapp/project_list.html', {'projects': projects})
 
 
 import os
